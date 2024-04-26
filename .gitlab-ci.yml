@@ -9,7 +9,7 @@ build:
     # Update and install
     - apt update
     - apt full-upgrade --yes
-    - apt install --yes neofetch make cmake clang
+    - apt install --yes neofetch make cmake ninja clang
 
     # Version check
     - neofetch
