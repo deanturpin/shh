@@ -12,18 +12,18 @@ pages:
     - apt full-upgrade --yes
 
     # Version check
-    - echo '```' >> index.md
-    - neofetch  >> index.md
-    - make --version >> index.md
-    - cmake --version >> index.md
-    - ninja --version >> index.md
+    - echo '```' | tee --append index.md
+    - neofetch | tee --append index.md
+    - make --version | tee --append index.md
+    - cmake --version | tee --append index.md
+    - ninja --version | tee --append index.md
 
     # Build and run
-    - make >> index.md
+    - make | tee --append index.md
 
     # Tidy up
-    - echo '```' >> index.md
-    - date >> index.md
+    - echo '```' | tee --append index.md
+    - date | tee --append index.md
 
     # Publish
     - apt install --yes pandoc
