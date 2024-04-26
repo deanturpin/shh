@@ -17,7 +17,6 @@ pages:
     - make --version >> index.md
     - cmake --version >> index.md
     - ninja --version >> index.md
-    - clang --version >> index.md
 
     # Build and run
     - make >> index.md
@@ -27,5 +26,6 @@ pages:
     - date >> index.md
 
     # Publish
+    - apt install --yes pandoc
     - mkdir public/
     - pandoc --standalone --to html5 --output public/index.html index.md
