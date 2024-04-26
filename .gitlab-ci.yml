@@ -9,12 +9,13 @@ build:
     # Update and install
     - apt update
     - apt full-upgrade --yes
-    - apt install --yes neofetch make cmake ninja clang
+    - apt install --yes neofetch make cmake ninja-build clang
 
     # Version check
     - neofetch
     - make --version
     - cmake --version
+    - 
     - clang --version
 
     # Build and run
