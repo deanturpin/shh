@@ -1,5 +1,5 @@
 #include <print>
 
 int main() {
-    std::print("Careless Wispa");
+    std::println("Careless Wispa");
 }
