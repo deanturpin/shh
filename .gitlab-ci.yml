@@ -1,9 +1,9 @@
 
 build:
 
+  tags:
+    - macos
   stage: build
-  image: macos:latest
-
   script:  
     - uname -a
     - make
