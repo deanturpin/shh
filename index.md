@@ -1,4 +1,4 @@
-# Careless Wispa
+# Careless Wispa: loose lips sink ships
 
 > Why did George Michael get chocolate on his pants? Because he was careless with his Wispa.
 
@@ -15,3 +15,5 @@ Command line monitoring and summarising of network traffic.
 - [ ] Use CMake
 - [ ] Use latest clang
 - [ ] Use threads (maybe coroutines)
+
+---

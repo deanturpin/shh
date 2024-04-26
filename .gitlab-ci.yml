@@ -1,22 +1,31 @@
+pages:
 
-build:
-
-  image: ubuntu:devel
+  image: deanturpin/gcc
   stage: build
+  artifacts:
+    paths:
+      - public
 
-  script:  
-
-    # Update and install
+  script:
+    # Update
     - apt update
     - apt full-upgrade --yes
-    - apt install --yes neofetch make cmake ninja-build clang build-essential
 
     # Version check
-    - neofetch
-    - make --version
-    - cmake --version
-    - ninja --version
-    - clang --version
+    - echo '```' >> index.md
+    - neofetch  >> index.md
+    - make --version >> index.md
+    - cmake --version >> index.md
+    - ninja --version >> index.md
+    - clang --version >> index.md
 
     # Build and run
-    - make
+    - make >> index.md
+
+    # Tidy up
+    - echo '```' >> index.md
+    - date >> index.md
+
+    # Publish
+    - mkdir public/
+    - pandoc --standalone --to html5 --output public/index.html index.md
