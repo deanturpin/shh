@@ -29,4 +29,4 @@ pages:
     - cat index.md
     - apt install --yes pandoc
     - mkdir public/
-    - pandoc --standalone --output public/index.html index.md
+    # - pandoc --standalone --output public/index.html index.md
