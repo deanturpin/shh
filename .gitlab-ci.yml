@@ -1,9 +1,14 @@
 
 build:
 
-  tags:
-    - macos
+  image: ubuntu:devel
   stage: build
+
   script:  
-    - uname -a
-    - make
+    - apt update
+    - apt full-upgrade --yes
+    - apt install --yes make cmake clang
+
+    - make --version
+    - cmake --version
+    - clang --version
