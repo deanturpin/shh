@@ -28,4 +28,4 @@ pages:
     # Publish
     - apt install --yes pandoc
     - mkdir public/
-    - pandoc --standalone --to html5 --output public/index.html index.md
+    - pandoc --standalone --output public/index.html index.md
