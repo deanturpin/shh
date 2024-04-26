@@ -7,7 +7,7 @@ build:
   script:  
     - apt update
     - apt full-upgrade --yes
-    - apt install --yes make cmake clang
+    - apt install --yes make cmake clang19
 
     - make --version
     - cmake --version
