@@ -26,6 +26,7 @@ pages:
     - date | tee --append index.md
 
     # Publish
+    - cat index.md
     - apt install --yes pandoc
     - mkdir public/
     - pandoc --standalone --output public/index.html index.md
