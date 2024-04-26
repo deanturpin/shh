@@ -5,10 +5,16 @@ build:
   stage: build
 
   script:  
+
+    # Update and install
     - apt update
     - apt full-upgrade --yes
-    - apt install --yes make cmake clang19
+    - apt install --yes make cmake clang
 
+    # Version check
     - make --version
     - cmake --version
     - clang --version
+
+    # Build
+    - make
