@@ -1,4 +1,4 @@
-pages:
+build:
 
   image: deanturpin/gcc
   stage: build
