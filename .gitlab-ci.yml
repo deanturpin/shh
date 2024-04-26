@@ -15,7 +15,7 @@ build:
     - neofetch
     - make --version
     - cmake --version
-    - 
+    - ninja --version
     - clang --version
 
     # Build and run
