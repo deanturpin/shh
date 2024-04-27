@@ -27,6 +27,6 @@ build:
 
     # Publish
     - cat index.md
-    - apt install --yes pandoc
-    - mkdir public/
-    - pandoc index.md --output public/index.html
+    # - apt install --yes pandoc
+    # - mkdir public/
+    # - pandoc index.md --output public/index.html
