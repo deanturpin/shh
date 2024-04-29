@@ -1,4 +1,4 @@
-build:
+pages:
 
   image: deanturpin/gcc
   stage: deploy
