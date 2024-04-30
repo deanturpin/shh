@@ -32,7 +32,7 @@ constexpr std::string_view get_quote() {
 void capture(std::string_view network_device) {
 
   char errbuf[256];
-  std::println(stderr, "Opening network device: '{}'", network_device);
+  std::println("Opening network device: '{}'", network_device);
 
   // Open the network device in promiscuous mode
   pcap_t *pcap = pcap_open_live(std::string{network_device}.c_str(), 65535, 1,
@@ -52,40 +52,40 @@ void capture(std::string_view network_device) {
     const u_char *data = pcap_next(pcap, &header);
 
     if (data == nullptr) {
-      std::println(stderr, "{}", get_quote());
+      std::println("{}", get_quote());
       return;
     }
 
     // Print device name
-    std::print(stderr, "{}\t", network_device);
+    std::print("{}\t", network_device);
 
     // print packet data
     for (auto i = size_t{}; i < header.len; ++i) {
 
       // Print the mac address
       if (i < 6) {
-        std::print(stderr, "{:02x}", data[i]);
+        std::print("{:02x}", data[i]);
 
         if (i < 5)
-          std::print(stderr, ":");
+          std::print(":");
       } else
         break;
     }
 
     // Print packet type
-    std::print(stderr, "\t- {:02x}{:02x}", data[12], data[13]);
+    std::print("\t- {:02x}{:02x}", data[12], data[13]);
 
     // Print ip addresses
-    std::print(stderr, " - {}.{}.{}.{}", data[26], data[27], data[28],
+    std::print(" - {}.{}.{}.{}", data[26], data[27], data[28],
                data[29]);
 
     // Print packet length
-    std::println(stderr, "\t- {} bytes", header.len);
+    std::println("\t- {} bytes", header.len);
   }
 }
 
 int main() {
-  std::println(stderr, "Careless Wispa");
+  std::println("Careless Wispa");
 
   // List network devices
   std::println("Network devices:");
@@ -99,7 +99,7 @@ int main() {
   }
 
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    std::println(stderr, "\t{}", d->name);
+    std::println("\t{}", d->name);
 
   // Capture a batch of packets from each network device
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
