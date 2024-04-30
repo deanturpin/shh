@@ -4,7 +4,7 @@ all:
 	time build/wispa
 
 entr:
-	ls CMakeLists.txt Makefile src/* | entr -cr make clean all
+	ls CMakeLists.txt Makefile src/* | entr -cr make
 
 stats:
 	sloccount bin/ src/*.cxx src/CMakeLists.txt Makefile | grep -E "SLOC|Cost"

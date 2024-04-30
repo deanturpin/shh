@@ -5,6 +5,9 @@ pages:
   artifacts: {paths: [public]}
   script:
 
+    - apt update
+    - apt install --yes libpcap-dev
+
     # Start code section
     - echo '```' | tee --append index.md
 
