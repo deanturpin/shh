@@ -8,12 +8,6 @@ pages:
     # Start code section
     - echo '```' | tee --append index.md
 
-    # Report versions
-    # - neofetch | tee --append index.md
-    # - make --version | tee --append index.md
-    # - cmake --version | tee --append index.md
-    # - ninja --version | tee --append index.md
-
     # Build and run
     - make | tee --append index.md
 
@@ -25,4 +19,3 @@ pages:
     - cat index.md
     - mkdir public/
     - pandoc index.md --standalone -f gfm -t html5 --output public/index.html
-
