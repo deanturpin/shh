@@ -69,7 +69,7 @@ void capture(std::string_view network_device) {
     return;
   }
 
-  for (auto _ : std::views::iota(0, 2)) {
+  for (auto _ : std::views::iota(0, 200)) {
 
     // Read packets
     pcap_pkthdr header;
