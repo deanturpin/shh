@@ -5,6 +5,7 @@
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <string.h>
 
 constexpr std::array quotes{
     "Hello? Is it me you're looking for?",
