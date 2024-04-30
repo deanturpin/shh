@@ -69,7 +69,7 @@ void capture(std::string_view network_device) {
     return;
   }
 
-  for (auto _ : std::views::iota(0, 200)) {
+  for (auto _ : std::views::iota(0, 9)) {
 
     // Read packets
     pcap_pkthdr header;
@@ -142,4 +142,6 @@ int main() {
         break;
       // std::jthread(std::launch::async, capture, d->name);
     }
+
+    std::println("cya!");
 }
