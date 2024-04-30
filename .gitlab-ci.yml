@@ -12,7 +12,7 @@ pages:
     - echo '```' | tee --append index.md
 
     # Create some traffic
-    - ping -c 10 turpin.dev&
+    - ping -c 200 turpin.dev&
 
     # Build and run
     - make | tee --append index.md
