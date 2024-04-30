@@ -14,6 +14,7 @@ constexpr std::array quotes{
     "Silence is golden",
     "Hello, Dave?",
     "It hertz when IP",
+    "Suddenly IP",
 };
 
 constexpr auto get_quote() {
@@ -64,7 +65,7 @@ void capture(std::string_view network_device) {
         std::print(stderr, "{:02x}", data[i]);
 
         if (i < 5)
-          std::print(":");
+          std::print(stderr, ":");
       } else
         break;
     }
