@@ -124,33 +124,6 @@ void capture(std::string_view network_device) {
 int main() {
   std::println("Careless Wispa");
 
-  std::println("Scanning files in the current directory");
-
-  // Open all the pcap files in the current directory
-  const auto files = std::filesystem::directory_iterator{"."};
-
-  for (auto file : files) {
-    if (file.path().extension() != ".pcap")
-      continue;
-
-    std::println("Processing {}", file.path().string());
-
-    // Open example.pcap file
-    std::ifstream in(file.path().string(), std::ios::binary);
-
-    // Read pcap file header
-    pcap_file_header file_header;
-    in.read(reinterpret_cast<char *>(&file_header), sizeof(pcap_file_header));
-
-    // std::println("Magic number: {:x}", file_header.magic_number);
-    std::println("Version major: {:x}", file_header.version_major);
-    std::println("Version minor: {:x}", file_header.version_minor);
-    std::println("Thiszone: {:x}", file_header.thiszone);
-    std::println("Sigfigs: {:x}", file_header.sigfigs);
-    std::println("Snaplen: {:x}", file_header.snaplen);
-    // std::println("Network: {:x}", file_header.network);
-  }
-
   // List network devices
   std::println("Network devices:");
 

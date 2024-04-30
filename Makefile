@@ -1,7 +1,7 @@
 all:
 	cmake -B build -S src -G Ninja
 	cmake --build build --parallel
-	time build/wispa
+	build/wispa
 
 entr:
 	ls CMakeLists.txt Makefile src/* | entr -cr make
