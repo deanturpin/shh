@@ -9,19 +9,18 @@ pages:
     - apt install --yes libpcap-dev iputils-ping
 
     # Start code section
+    - date | tee --append index.md
     - echo '```' | tee --append index.md
 
-    # Create some traffic
+    # Create some traffic in the background
     - ping -c 200 turpin.dev&
 
     # Build and run
     - make | tee --append index.md
 
-    # End code section and timestamp
+    # End code section
     - echo '```' | tee --append index.md
-    - date | tee --append index.md
 
     # Publish
-    - cat index.md
     - mkdir public/
     - pandoc index.md --standalone -f gfm -t html5 --output public/index.html

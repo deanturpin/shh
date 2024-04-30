@@ -17,7 +17,8 @@ constexpr std::array quotes{
     "Suddenly IP",
 };
 
-constexpr auto get_quote() {
+// Get a random quote
+constexpr std::string_view get_quote() {
   // Get random index
   auto index = std::rand() % quotes.size();
   assert(index < quotes.size());
@@ -26,11 +27,10 @@ constexpr auto get_quote() {
   return quotes[std::rand() % quotes.size()];
 }
 
+// Capture packets from the given network device
 void capture(std::string_view network_device) {
 
   char errbuf[256];
-
-  //   constexpr auto network_device = +"en0";
   std::println(stderr, "Opening network device: '{}'", network_device);
 
   // Open the network device in promiscuous mode
@@ -43,7 +43,8 @@ void capture(std::string_view network_device) {
     return;
   }
 
-  for (auto _ : std::views::iota(0, 200)) {
+  // Process number of packets
+  for (auto _ : std::views::iota(0, 10)) {
 
     // Read packets
     pcap_pkthdr header;
@@ -70,14 +71,14 @@ void capture(std::string_view network_device) {
         break;
     }
 
-    // print packet type
+    // Print packet type
     std::print(stderr, "\t- {:02x}{:02x}", data[12], data[13]);
 
-    // print ip addresses
+    // Print ip addresses
     std::print(stderr, " - {}.{}.{}.{}", data[26], data[27], data[28],
                data[29]);
 
-    // print packet length
+    // Print packet length
     std::println(stderr, "\t- {} bytes", header.len);
   }
 }
@@ -99,12 +100,9 @@ int main() {
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
     std::println("\t{}", d->name);
 
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-
-    std::println("\t{}", d->name);
+  // Capture a batch of packets from each network device
+  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
     capture(d->name);
-    break;
-  }
 
   std::println("cya!");
 }
