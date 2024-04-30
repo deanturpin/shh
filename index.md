@@ -16,6 +16,7 @@ Command line monitoring and summarising of network traffic.
 - [ ] Listen on all interfaces (maybe in different threads?)
 - [ ] Link to mermaid.live diagram of captured packets
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
+- [ ] How to deploy? Package or container?
 - [x] Print random quiet quote
 - [x] Read from a file
 - [x] Read live data in promiscuous mode
@@ -24,9 +25,7 @@ Command line monitoring and summarising of network traffic.
 - [x] Use CMake
 - [x] Use latest clang
 
-## Review
-
-```cpp
+<!--
   // // Set a filter (optional)
   // struct bpf_program filter;
   // pcap_compile(pcapHandle, &filter, "tcp port 80", 0, PCAP_NETMASK_UNKNOWN);
@@ -65,6 +64,6 @@ Command line monitoring and summarising of network traffic.
 //   std::println("cya!");
 //   return 0;
 // });
-```
+-->
 
 ---
