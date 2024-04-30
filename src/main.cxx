@@ -69,7 +69,7 @@ void capture(std::string_view network_device) {
     return;
   }
 
-  for (auto _ : std::views::iota(0, 10)) {
+  for (auto _ : std::views::iota(0, 2)) {
 
     // Read packets
     pcap_pkthdr header;
@@ -133,12 +133,13 @@ int main() {
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
     std::println("\t{}", d->name);
 
-// //   while (true)
-//     for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
+//   while (true)
+    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
 
-//       std::println("\t{}", d->name);
-//       capture(d->name);
+      std::println("\t{}", d->name);
+      capture(d->name);
 
-//       // std::jthread(std::launch::async, capture, d->name);
-//     }
+        break;
+      // std::jthread(std::launch::async, capture, d->name);
+    }
 }
