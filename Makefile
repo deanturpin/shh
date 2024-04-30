@@ -11,3 +11,9 @@ stats:
 
 clean:
 	$(RM) -r build
+
+capture.pcap:
+	tcpdump -c 10 -w $@
+
+format:
+	clang-format -i src/*.cxx src/*.h
