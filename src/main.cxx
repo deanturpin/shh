@@ -122,19 +122,16 @@ int main() {
   // List network devices
   std::println("Network devices:");
 
-  // quit early as a test
-  return 0;
+  pcap_if_t *alldevs;
+  char errbuf[256];
 
-//   pcap_if_t *alldevs;
-//   char errbuf[256];
+  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    std::println("Error in pcap_findalldevs: {}", errbuf);
+    return 1;
+  }
 
-//   if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-//     std::println("Error in pcap_findalldevs: {}", errbuf);
-//     return 1;
-//   }
-
-//   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-//     std::println("\t{}", d->name);
+  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+    std::println("\t{}", d->name);
 
 // //   while (true)
 //     for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
