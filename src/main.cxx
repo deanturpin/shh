@@ -1,15 +1,10 @@
 #include <array>
 #include <cassert>
-#include <cstdint>
-#include <filesystem>
-#include <fstream>
 #include <pcap.h>
 #include <print>
 #include <string>
 #include <string_view>
-// #include <future>
 #include <ranges>
-#include <thread>
 
 constexpr std::array quotes{
     "Hello? Is it me you're looking for?",
@@ -127,23 +122,26 @@ int main() {
   // List network devices
   std::println("Network devices:");
 
-  pcap_if_t *alldevs;
-  char errbuf[256];
+  // quit early as a test
+  return 0;
 
-  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-    std::println("Error in pcap_findalldevs: {}", errbuf);
-    return 1;
-  }
+//   pcap_if_t *alldevs;
+//   char errbuf[256];
 
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    std::println("\t{}", d->name);
+//   if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+//     std::println("Error in pcap_findalldevs: {}", errbuf);
+//     return 1;
+//   }
 
-//   while (true)
-    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
+//   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+//     std::println("\t{}", d->name);
 
-      std::println("\t{}", d->name);
-      capture(d->name);
+// //   while (true)
+//     for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
 
-      // std::jthread(std::launch::async, capture, d->name);
-    }
+//       std::println("\t{}", d->name);
+//       capture(d->name);
+
+//       // std::jthread(std::launch::async, capture, d->name);
+//     }
 }
