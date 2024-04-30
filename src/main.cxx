@@ -3,9 +3,9 @@
 #include <pcap.h>
 #include <print>
 #include <ranges>
+#include <string.h>
 #include <string>
 #include <string_view>
-#include <string.h>
 
 constexpr std::array quotes{
     "Hello? Is it me you're looking for?",
@@ -45,7 +45,7 @@ void capture(std::string_view network_device) {
   }
 
   // Process number of packets
-  for (auto _ : std::views::iota(0, 10)) {
+  for (auto _ : std::views::iota(0, 100)) {
 
     // Read packets
     pcap_pkthdr header;
@@ -102,9 +102,10 @@ int main() {
     std::println(stderr, "\t{}", d->name);
 
   // Capture a batch of packets from each network device
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    if (strcmp(d->name, "lo") != 0)
-        capture(d->name);
+  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
+    capture(d->name);
+    break;
+  }
 
   std::println("cya!");
 }
