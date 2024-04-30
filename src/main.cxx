@@ -84,7 +84,7 @@ void capture(std::string_view network_device) {
 }
 
 int main() {
-  std::println("Careless Wispa");
+  std::println(stderr, "Careless Wispa");
 
   // List network devices
   std::println("Network devices:");
@@ -98,11 +98,12 @@ int main() {
   }
 
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    std::println("\t{}", d->name);
+    std::println(stderr, "\t{}", d->name);
 
   // Capture a batch of packets from each network device
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    capture(d->name);
+    if (strcmp(d->name, "lo") != 0)
+        capture(d->name);
 
   std::println("cya!");
 }
