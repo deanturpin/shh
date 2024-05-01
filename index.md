@@ -9,10 +9,13 @@ Command line monitoring and summarising of network traffic.
 ## Requirements
 
 - [ ] Start typing to filter
+- [ ] snoop number of packets on each interface
+- [ ] Show summary of packet types
 - [ ] Don't scroll display, jump to the top and overwrite
-- [ ] Lookup MAC addresses in a vendor database
+- [x] Lookup MAC addresses in a vendor database
 - [ ] Use threads (maybe coroutines)
-- [ ] List network interfaces
+- [ ] lock reporter for reading only (shared_mutex)
+- [x] List network interfaces
 - [ ] Listen on all interfaces (maybe in different threads?)
 - [ ] Link to mermaid.live diagram of captured packets
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
@@ -27,13 +30,21 @@ Command line monitoring and summarising of network traffic.
 
 <!--
 
-# Vendor IDs
-View the latest on [ieee.org](http://standards-oui.ieee.org/oui.txt).
+    // struct EthernetHeader {
+    //     uint8_t destMac[6];  // Destination MAC address
+    //     uint8_t srcMac[6];   // Source MAC address
+    //     uint16_t etherType;  // Ethernet type
+    // };
 
-To install on Ubuntu:
-```bash
-sudo apt install --yes arp-scan
-get-oui
+IPv4 (0x0800): Indicates that the payload is an IPv4 packet.
+IPv6 (0x86DD): Indicates that the payload is an IPv6 packet.
+ARP (0x0806): Indicates that the payload is an ARP (Address Resolution Protocol) packet.
+VLAN Tagged Frame (0x8100): Indicates the presence of VLAN tagging.
+MPLS Unicast (0x8847): Indicates the presence of MPLS (Multiprotocol Label Switching) payload.
+MPLS Multicast (0x8848): Indicates the presence of MPLS payload for multicast packets.
+LLDP (0x88CC): Indicates the payload is a Link Layer Discovery Protocol frame.
+
+
 ```
 
   // // Set a filter (optional)
