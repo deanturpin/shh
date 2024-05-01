@@ -1,32 +1,32 @@
 #include <atomic>
 #include <cassert>
 #include <chrono>
+#include <map>
 #include <mutex>
 #include <pcap.h>
 #include <print>
+#include <ranges>
 #include <string.h>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
-#include <map>
-#include <ranges>
 
 // Forward declarations
 std::map<std::string, std::string> get_oui();
 
 // Information about devices
 struct device_t {
-  std::string_view network{};
-  std::string ip{"____________"};
-  std::string vendor{};
   size_t packets{};
   size_t packet_length{};
   uint16_t packet_type{};
+  std::string_view network{};
+  std::string ip{"____________"};
+  std::string vendor{};
 };
 
 // Capture packets from the given network device
-auto capture2(std::string_view network_device) {
+auto capture(std::string_view network_device) {
 
   auto devices = std::multimap<std::string, device_t>{};
 
@@ -67,7 +67,8 @@ auto capture2(std::string_view network_device) {
 
     // Only set IP address if it's a suitable packet type
     if (device.packet_type == 0x0800)
-      device.ip = std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
+      device.ip =
+          std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
 
     // Add device to the list
     devices.emplace(mac, device);
@@ -115,12 +116,16 @@ int main() {
   std::mutex mac_mutex;
   std::map<std::string, device_t> devices;
 
+  // Create container for all threads
+  std::vector<std::thread> threads;
+
   // Search for MAC addresses
-  std::thread sniffer{[&]() {
+  threads.emplace_back([&]() {
     while (run) {
 
       // Capture packets from each network device
-      auto dx = capture2(network_devices[0]);
+      auto dx = capture(network_devices[0]);
+
       {
         std::scoped_lock lock{mac_mutex};
 
@@ -134,11 +139,10 @@ int main() {
     }
 
     std::println("Sniffer stopped");
-  }};
+  });
 
-  //   std::vector<std::thread> threads;
   // Report MACs seen and packet count
-  auto reporter = std::thread{[&]() {
+  threads.emplace_back([&]() {
     while (run) {
 
       // Clear terminal
@@ -163,7 +167,7 @@ int main() {
     }
 
     std::println("Reporter stopped");
-  }};
+  });
 
   // Wait for a while
   std::this_thread::sleep_for(60s);
@@ -172,11 +176,7 @@ int main() {
   run = false;
 
   // Wait for the threads to finish
-  if (sniffer.joinable())
-    sniffer.join();
-
-  if (reporter.joinable())
-    reporter.join();
-
-  std::println("cya!");
+  for (auto &t : threads)
+    if (t.joinable())
+      t.join();
 }
