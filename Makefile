@@ -1,4 +1,4 @@
-all:
+all: oui.txt
 	cmake -B build -S src -G Ninja
 	cmake --build build --parallel
 	build/wispa
@@ -12,8 +12,8 @@ stats:
 clean:
 	$(RM) -r build
 
-capture.pcap:
-	tcpdump -c 10 -w $@
+oui.txt:
+	curl -O https://standards-oui.ieee.org/oui/oui.txt
 
 format:
-	clang-format -i src/*.cxx src/*.h
+	clang-format -i src/*.cxx

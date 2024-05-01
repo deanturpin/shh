@@ -26,6 +26,16 @@ Command line monitoring and summarising of network traffic.
 - [x] Use latest clang
 
 <!--
+
+# Vendor IDs
+View the latest on [ieee.org](http://standards-oui.ieee.org/oui.txt).
+
+To install on Ubuntu:
+```bash
+sudo apt install --yes arp-scan
+get-oui
+```
+
   // // Set a filter (optional)
   // struct bpf_program filter;
   // pcap_compile(pcapHandle, &filter, "tcp port 80", 0, PCAP_NETMASK_UNKNOWN);

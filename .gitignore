@@ -1,3 +1,2 @@
 build/
-*.pcapng
-*.pcap
+oui.txt
