@@ -1,5 +1,7 @@
 #include <array>
+#include <atomic>
 #include <cassert>
+#include <chrono>
 #include <fstream>
 #include <map>
 #include <pcap.h>
@@ -8,6 +10,7 @@
 #include <string.h>
 #include <string>
 #include <string_view>
+#include <thread>
 
 constexpr std::array quotes{
     "Hello? Is it me you're looking for?",
@@ -140,38 +143,94 @@ void capture(std::string_view network_device,
 }
 
 int main() {
-  std::println("Careless Wispa");
 
-  std::print("Processing vendor file... ");
-  auto oui = get_oui();
-  std::println("{} vendors", oui.size());
+  //   std::print("Processing vendor file... ");
+  //   auto oui = get_oui();
+  //   std::println("{} vendors", oui.size());
 
-  // print first few vendors
-  for (auto [key, value] : oui | std::views::take(20))
-    std::println("{} -> {} ({} {})", key, value, key.size(), value.size());
+  //   // print first few vendors
+  //   for (auto [key, value] : oui | std::views::take(20))
+  //     std::println("{} -> {} ({} {})", key, value, key.size(), value.size());
 
-  // List network devices
-  std::println("Network devices:");
+  //   // List network devices
+  //   std::println("Network devices:");
 
-  pcap_if_t *alldevs;
-  char errbuf[256];
+  //   pcap_if_t *alldevs;
+  //   char errbuf[256];
 
-  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-    std::println("Error in pcap_findalldevs: {}", errbuf);
-    return 1;
-  }
+  //   if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+  //     std::println("Error in pcap_findalldevs: {}", errbuf);
+  //     return 1;
+  //   }
 
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    std::println("\t{}", d->name);
+  //   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+  //     std::println("\t{}", d->name);
 
-  // Capture a batch of packets from each network device
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-    capture(d->name, oui);
-    break;
-  }
+  //   // Capture a batch of packets from each network device
+  //   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
+  //     capture(d->name, oui);
+  //     break;
+  //   }
 
-  std::println("Freeing network devices");
-  pcap_freealldevs(alldevs);
+  //   std::println("Freeing network devices");
+  //   pcap_freealldevs(alldevs);
+
+  //   std::println("Create thread for sniffing");
+
+  // Control the threads
+  std::atomic_bool stop{false};
+
+  // Shared MAC data
+  std::mutex mac_mutex;
+  std::map<std::string, size_t> macs;
+
+  // Search for MAC addresses
+  std::thread sniffer{[&]() {
+    while (not stop.load()) {
+
+      // std::println("Sniffing...");
+      {
+        std::scoped_lock lock{mac_mutex};
+        ++macs["00:00:00:00:00:00"];
+      }
+
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
+    }
+
+    std::println("Sniffer stopped");
+  }};
+
+  // Report MACs seen and packet count
+  std::thread reporter{[&]() {
+    while (not stop) {
+
+      // Clear terminal
+      std::print("\033[2J\033[1;1H");
+
+      {
+        std::scoped_lock lock{mac_mutex};
+        for (auto [mac, count] : macs)
+          std::println("{} {}", mac, count);
+      }
+
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    std::println("Reporter stopped");
+  }};
+
+  //   // Wait for ten seconds
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+
+  // Request stop
+  stop.store(true);
+
+  // Wait for the threads to finish
+  if (sniffer.joinable())
+    sniffer.join();
+
+  if (reporter.joinable())
+    reporter.join();
 
   std::println("cya!");
 }
