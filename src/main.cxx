@@ -182,9 +182,12 @@ int main() {
 
   // Capture a batch of packets from each network device
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-    capture(d->name);
+    capture(d->name, oui);
     break;
   }
+
+  std::println("Freeing network devices");
+  pcap_freealldevs(alldevs);
 
   std::println("cya!");
 }
