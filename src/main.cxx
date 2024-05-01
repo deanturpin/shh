@@ -49,9 +49,9 @@ auto get_oui() {
       std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 
       // Remove control characters in value
-        value.erase(std::remove_if(value.begin(), value.end(),
-                                    [](char c) { return std::iscntrl(c); }),
-                    value.end());
+      value.erase(std::remove_if(value.begin(), value.end(),
+                                 [](char c) { return std::iscntrl(c); }),
+                  value.end());
 
       oui[key] = value;
 
@@ -104,25 +104,25 @@ void capture(std::string_view network_device,
     // Print device name
     std::print("{} ", network_device);
 
-// struct EthernetHeader {
-//     uint8_t destMac[6];  // Destination MAC address
-//     uint8_t srcMac[6];   // Source MAC address
-//     uint16_t etherType;  // Ethernet type
-// };
+    // struct EthernetHeader {
+    //     uint8_t destMac[6];  // Destination MAC address
+    //     uint8_t srcMac[6];   // Source MAC address
+    //     uint16_t etherType;  // Ethernet type
+    // };
 
     // Extract MAC address
     auto mac = std::string{};
     for (auto i = size_t{6}; i < 12; ++i) {
 
       // Print the mac address
-    //   if (i < 6) {
-        mac += std::format("{:02x}", data[i]);
+      //   if (i < 6) {
+      mac += std::format("{:02x}", data[i]);
 
-        // if (i < 5)
-          mac += "-";
+      // if (i < 5)
+      mac += "-";
 
-    //   } else
-    //     break;
+      //   } else
+      //     break;
     }
 
     // Print mac address
@@ -133,13 +133,11 @@ void capture(std::string_view network_device,
     // std::print("{} ", short_vendor);
 
     // Check if vendor is in OUI
-    auto vendor = oui.contains(short_vendor)
-                      ? oui[short_vendor]
-                      : short_vendor + " unknown";
+    auto vendor = oui.contains(short_vendor) ? oui[short_vendor]
+                                             : short_vendor + " unknown";
 
     // Print packet type
     std::print("{:02x}{:02x} ", data[12], data[13]);
-
 
     // Print source ip address
     std::print("{}.{}.{}.{} > ", data[30], data[31], data[32], data[33]);
