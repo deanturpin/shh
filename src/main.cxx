@@ -112,25 +112,11 @@ void capture(std::string_view network_device,
 
     // Extract MAC address
     auto mac = std::string{};
-    for (auto i = size_t{6}; i < 12; ++i) {
-
-      // Print the mac address
-      //   if (i < 6) {
-      mac += std::format("{:02x}", data[i]);
-
-      // if (i < 5)
-      mac += "-";
-
-      //   } else
-      //     break;
-    }
-
-    // Print mac address
-    // std::print("{} ", mac);
+    for (auto i = size_t{6}; i < 12; ++i)
+      mac += std::format("{:02x}", data[i]) + "-";
 
     // Extract vendor from mac
     auto short_vendor = mac.substr(0, 8);
-    // std::print("{} ", short_vendor);
 
     // Check if vendor is in OUI
     auto vendor = oui.contains(short_vendor) ? oui[short_vendor]
