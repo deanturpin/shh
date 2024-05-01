@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include <map>
+#include <mutex>
 #include <pcap.h>
 #include <print>
 #include <ranges>
@@ -11,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 constexpr std::array quotes{
     "Hello? Is it me you're looking for?",
@@ -75,155 +77,159 @@ constexpr std::string_view get_quote() {
   return quotes[std::rand() % quotes.size()];
 }
 
-// Capture packets from the given network device
-void capture(std::string_view network_device,
-             std::map<std::string, std::string> &oui) {
+// Information about devices
+struct device_t {
+  std::string_view network{};
+  std::string ip{"____________"};
+  std::string vendor{};
+  size_t packets{};
+  size_t packet_length{};
+  uint16_t packet_type{};
+};
 
-  char errbuf[256];
-  std::println("Opening network device: '{}'", network_device);
+// Capture packets from the given network device
+auto capture2(std::string_view network_device) {
+
+  auto devices = std::multimap<std::string, device_t>{};
 
   // Open the network device in promiscuous mode
+  char errbuf[256];
   pcap_t *pcap = pcap_open_live(std::string{network_device}.c_str(), 65535, 1,
                                 1000, errbuf);
 
   if (pcap == nullptr) {
     std::println("Error opening network device: '{}'",
                  std::string_view(errbuf));
-    return;
+    return devices;
   }
 
   // Process number of packets
-  for (auto _ : std::views::iota(0, 1000)) {
+  for (auto _ : std::views::iota(0, 20)) {
+
+    // Create a new device for each packet
+    auto device = device_t{.network = network_device};
 
     // Read packets
     pcap_pkthdr header;
     const u_char *data = pcap_next(pcap, &header);
 
     if (data == nullptr) {
-      std::println("{}", get_quote());
+      //   std::println("{}", get_quote());
       continue;
     }
 
-    // Print device name
-    std::print("{} ", network_device);
-
-    // struct EthernetHeader {
-    //     uint8_t destMac[6];  // Destination MAC address
-    //     uint8_t srcMac[6];   // Source MAC address
-    //     uint16_t etherType;  // Ethernet type
-    // };
+    device.network = network_device;
 
     // Extract MAC address
     auto mac = std::string{};
     for (auto i = size_t{6}; i < 12; ++i)
       mac += std::format("{:02x}", data[i]) + "-";
 
-    // Extract vendor from mac
-    auto short_vendor = mac.substr(0, 8);
-
-    // Check if vendor is in OUI
-    auto vendor = oui.contains(short_vendor) ? oui[short_vendor]
-                                             : short_vendor + " unknown";
-
-    // Print packet type
-    std::print("{:02x}{:02x} ", data[12], data[13]);
-
     // Print source ip address
-    std::print("{}.{}.{}.{} > ", data[30], data[31], data[32], data[33]);
+    // std::print("{}.{}.{}.{} > ", data[30], data[31], data[32], data[33]);
 
-    // Print destination ip address
-    std::print("{}.{}.{}.{} ", data[26], data[27], data[28], data[29]);
+    // Copy these data into the outgoing device
+    device.packet_type = data[12] << 8 | data[13];
+    device.packet_length = header.len;
+    device.packets = 1;
 
-    // print vendor
-    std::print("{} ", vendor);
+    // Only set IP address if correct packet type
+    if (device.packet_type == 0x0800)
+      device.ip = std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
 
-    // Print packet length
-    std::println("({} bytes)", header.len);
+    // Add device to the list
+    devices.emplace(mac, device);
   }
+
+  return devices;
 }
 
 int main() {
 
-  //   std::print("Processing vendor file... ");
-  //   auto oui = get_oui();
-  //   std::println("{} vendors", oui.size());
+  std::print("Processing vendor file... ");
+  auto oui = get_oui();
+  std::println("{} vendors", oui.size());
 
-  //   // print first few vendors
-  //   for (auto [key, value] : oui | std::views::take(20))
-  //     std::println("{} -> {} ({} {})", key, value, key.size(), value.size());
+  // List network devices
+  std::println("Network devices:");
 
-  //   // List network devices
-  //   std::println("Network devices:");
+  pcap_if_t *alldevs;
+  char errbuf[256];
 
-  //   pcap_if_t *alldevs;
-  //   char errbuf[256];
+  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    std::println("Error in pcap_findalldevs: {}", errbuf);
+    return 1;
+  }
 
-  //   if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-  //     std::println("Error in pcap_findalldevs: {}", errbuf);
-  //     return 1;
-  //   }
-
-  //   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-  //     std::println("\t{}", d->name);
-
-  //   // Capture a batch of packets from each network device
-  //   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-  //     capture(d->name, oui);
-  //     break;
-  //   }
-
-  //   std::println("Freeing network devices");
-  //   pcap_freealldevs(alldevs);
-
-  //   std::println("Create thread for sniffing");
+  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+    std::println("\t{}", d->name);
 
   // Control the threads
-  std::atomic_bool stop{false};
+  std::atomic_bool run{true};
 
   // Shared MAC data
   std::mutex mac_mutex;
-  std::map<std::string, size_t> macs;
+  std::map<std::string, device_t> devices;
 
   // Search for MAC addresses
   std::thread sniffer{[&]() {
-    while (not stop.load()) {
+    while (run) {
 
-      // std::println("Sniffing...");
+      // Capture packets from each network device
+      auto dx = capture2("en0");
       {
         std::scoped_lock lock{mac_mutex};
-        ++macs["00:00:00:00:00:00"];
-      }
 
-      std::this_thread::sleep_for(std::chrono::microseconds(1));
+        // Add devices to the list
+        for (auto [mac, device] : dx) {
+
+          devices[mac].packets += device.packets;
+          devices[mac].ip = device.ip;
+        }
+      }
     }
 
     std::println("Sniffer stopped");
   }};
 
+  //   std::vector<std::thread> threads;
+
+  using namespace std::chrono_literals;
+
   // Report MACs seen and packet count
-  std::thread reporter{[&]() {
-    while (not stop) {
+  auto reporter = std::thread{[&]() {
+    while (run) {
 
       // Clear terminal
       std::print("\033[2J\033[1;1H");
 
+      // Print current time
+      auto now = std::chrono::system_clock::now();
+      auto now_c = std::chrono::system_clock::to_time_t(now);
+      std::println("{}", std::ctime(&now_c));
+
+      // Grab devices and print summary
       {
         std::scoped_lock lock{mac_mutex};
-        for (auto [mac, count] : macs)
-          std::println("{} {}", mac, count);
+        for (auto [mac, device] : devices) {
+          auto vendor = oui.contains(mac.substr(0, 8)) ? oui[mac.substr(0, 8)]
+                                                       : "unknown";
+          std::println("{}\t{}\t{}", device.ip, device.packets, vendor);
+        }
       }
 
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(500ms);
     }
 
     std::println("Reporter stopped");
   }};
 
-  //   // Wait for ten seconds
-  std::this_thread::sleep_for(std::chrono::seconds(10));
+  // Wait for a while
+  std::this_thread::sleep_for(100s);
 
   // Request stop
-  stop.store(true);
+  //   stop.store(true);
+  run = false;
 
   // Wait for the threads to finish
   if (sniffer.joinable())
