@@ -186,7 +186,7 @@ int main() {
   });
 
   // Wait for a while
-  std::this_thread::sleep_for(30 * 60s);
+  std::this_thread::sleep_for(60s);
 
   // Request all threads stop
   run = false;
