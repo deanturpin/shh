@@ -46,8 +46,6 @@ auto get_oui() {
                   value.end());
 
       oui[key] = value;
-
-      //   std::println("{} -> {}", key, value);
     }
   }
 
@@ -83,34 +81,28 @@ auto capture2(std::string_view network_device) {
   // Process number of packets
   for (auto _ : std::views::iota(0, 20)) {
 
-    // Create a new device for each packet
-    auto device = device_t{.network = network_device};
-
     // Read packets
     pcap_pkthdr header;
     const u_char *data = pcap_next(pcap, &header);
 
-    if (data == nullptr) {
-      //   std::println("{}", get_quote());
+    if (data == nullptr)
       continue;
-    }
-
-    device.network = network_device;
 
     // Extract MAC address
     auto mac = std::string{};
     for (auto i = size_t{6}; i < 12; ++i)
       mac += std::format("{:02x}", data[i]) + "-";
 
-    // Print source ip address
-    // std::print("{}.{}.{}.{} > ", data[30], data[31], data[32], data[33]);
+    // Create a new device to describe this packet
+    auto device = device_t{.network = network_device};
 
     // Copy these data into the outgoing device
+    device.network = network_device;
     device.packet_type = data[12] << 8 | data[13];
     device.packet_length = header.len;
     device.packets = 1;
 
-    // Only set IP address if correct packet type
+    // Only set IP address if it's a suitable packet type
     if (device.packet_type == 0x0800)
       device.ip = std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
 
