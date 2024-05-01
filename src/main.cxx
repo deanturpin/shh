@@ -222,7 +222,7 @@ int main() {
         std::scoped_lock lock{mac_mutex};
         for (auto [mac, device] : devices) {
           auto vendor = oui.contains(mac.substr(0, 8)) ? oui[mac.substr(0, 8)]
-                                                       : "unknown";
+                                                       : mac + " unknown";
           std::println("{}\t{}\t{}", device.ip, device.packets, vendor);
         }
       }
@@ -234,7 +234,7 @@ int main() {
   }};
 
   // Wait for a while
-  std::this_thread::sleep_for(100s);
+  std::this_thread::sleep_for(20s);
 
   // Request stop
   //   stop.store(true);
