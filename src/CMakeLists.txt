@@ -16,6 +16,8 @@ else()
 endif()
 
 project(wispa)
-add_executable(${PROJECT_NAME} main.cxx)
+add_executable(${PROJECT_NAME}
+    main.cxx
+    oui.cxx)
 
 target_link_libraries(${PROJECT_NAME} pcap)
