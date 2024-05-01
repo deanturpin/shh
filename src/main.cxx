@@ -17,8 +17,50 @@ constexpr std::array quotes{
     "Silence is golden",
     "Hello, Dave?",
     "It hertz when IP",
+    "Everybody hertz",
     "Suddenly IP",
 };
+
+auto get_oui() {
+
+  auto in = std::ifstream{"oui.txt"};
+
+  // Read whole file into a string
+  auto str = std::string{std::istreambuf_iterator<char>{in},
+                         std::istreambuf_iterator<char>{}};
+
+  // Parse each line
+  auto oui = std::map<std::string, std::string>{};
+
+  for (auto line : str | std::views::split('\n')) {
+
+    // Look for all the lines with the (hex) string
+    auto s = std::string{line.begin(), line.end()};
+    if (not s.contains("(hex)") or s.empty())
+      continue;
+
+    auto pos = s.find("(hex)");
+
+    if (pos != std::string::npos) {
+      auto key = s.substr(0, 8);
+      auto value = s.substr(pos + 6);
+
+      // Make the key lower case
+      std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+      // Remove control characters in value
+        value.erase(std::remove_if(value.begin(), value.end(),
+                                    [](char c) { return std::iscntrl(c); }),
+                    value.end());
+
+      oui[key] = value;
+
+      //   std::println("{} -> {}", key, value);
+    }
+  }
+
+  return oui;
+}
 
 // Get a random quote
 constexpr std::string_view get_quote() {
@@ -31,7 +73,8 @@ constexpr std::string_view get_quote() {
 }
 
 // Capture packets from the given network device
-void capture(std::string_view network_device) {
+void capture(std::string_view network_device,
+             std::map<std::string, std::string> &oui) {
 
   char errbuf[256];
   std::println("Opening network device: '{}'", network_device);
@@ -47,7 +90,7 @@ void capture(std::string_view network_device) {
   }
 
   // Process number of packets
-  for (auto _ : std::views::iota(0, 100)) {
+  for (auto _ : std::views::iota(0, 1000)) {
 
     // Read packets
     pcap_pkthdr header;
@@ -55,39 +98,73 @@ void capture(std::string_view network_device) {
 
     if (data == nullptr) {
       std::println("{}", get_quote());
-      return;
+      continue;
     }
 
     // Print device name
-    std::print("{}\t", network_device);
+    std::print("{} ", network_device);
 
-    // print packet data
-    for (auto i = size_t{}; i < header.len; ++i) {
+// struct EthernetHeader {
+//     uint8_t destMac[6];  // Destination MAC address
+//     uint8_t srcMac[6];   // Source MAC address
+//     uint16_t etherType;  // Ethernet type
+// };
+
+    // Extract MAC address
+    auto mac = std::string{};
+    for (auto i = size_t{6}; i < 12; ++i) {
 
       // Print the mac address
-      if (i < 6) {
-        std::print("{:02x}", data[i]);
+    //   if (i < 6) {
+        mac += std::format("{:02x}", data[i]);
 
-        if (i < 5)
-          std::print(":");
-      } else
-        break;
+        // if (i < 5)
+          mac += "-";
+
+    //   } else
+    //     break;
     }
 
-    // Print packet type
-    std::print("\t- {:02x}{:02x}", data[12], data[13]);
+    // Print mac address
+    // std::print("{} ", mac);
 
-    // Print ip addresses
-    std::print(" - {}.{}.{}.{}", data[26], data[27], data[28],
-               data[29]);
+    // Extract vendor from mac
+    auto short_vendor = mac.substr(0, 8);
+    // std::print("{} ", short_vendor);
+
+    // Check if vendor is in OUI
+    auto vendor = oui.contains(short_vendor)
+                      ? oui[short_vendor]
+                      : short_vendor + " unknown";
+
+    // Print packet type
+    std::print("{:02x}{:02x} ", data[12], data[13]);
+
+
+    // Print source ip address
+    std::print("{}.{}.{}.{} > ", data[30], data[31], data[32], data[33]);
+
+    // Print destination ip address
+    std::print("{}.{}.{}.{} ", data[26], data[27], data[28], data[29]);
+
+    // print vendor
+    std::print("{} ", vendor);
 
     // Print packet length
-    std::println("\t- {} bytes", header.len);
+    std::println("({} bytes)", header.len);
   }
 }
 
 int main() {
   std::println("Careless Wispa");
+
+  std::print("Processing vendor file... ");
+  auto oui = get_oui();
+  std::println("{} vendors", oui.size());
+
+  // print first few vendors
+  for (auto [key, value] : oui | std::views::take(20))
+    std::println("{} -> {} ({} {})", key, value, key.size(), value.size());
 
   // List network devices
   std::println("Network devices:");
