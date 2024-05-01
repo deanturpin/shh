@@ -1,4 +1,3 @@
-#include <array>
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -13,18 +12,6 @@
 #include <string_view>
 #include <thread>
 #include <vector>
-
-constexpr std::array quotes{
-    "Hello? Is it me you're looking for?",
-    "It's oh so quiet",
-    "Ssh...",
-    "Hush now",
-    "Silence is golden",
-    "Hello, Dave?",
-    "It hertz when IP",
-    "Everybody hertz",
-    "Suddenly IP",
-};
 
 auto get_oui() {
 
@@ -65,16 +52,6 @@ auto get_oui() {
   }
 
   return oui;
-}
-
-// Get a random quote
-constexpr std::string_view get_quote() {
-  // Get random index
-  auto index = std::rand() % quotes.size();
-  assert(index < quotes.size());
-
-  // Return a random quote
-  return quotes[std::rand() % quotes.size()];
 }
 
 // Information about devices
@@ -227,17 +204,16 @@ int main() {
         }
       }
 
-      std::this_thread::sleep_for(500ms);
+      std::this_thread::sleep_for(1s);
     }
 
     std::println("Reporter stopped");
   }};
 
   // Wait for a while
-  std::this_thread::sleep_for(20s);
+  std::this_thread::sleep_for(60s * 20);
 
-  // Request stop
-  //   stop.store(true);
+  // Request all threads stop
   run = false;
 
   // Wait for the threads to finish

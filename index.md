@@ -20,6 +20,7 @@ Command line monitoring and summarising of network traffic.
 - [ ] Link to mermaid.live diagram of captured packets
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
 - [ ] How to deploy? Package or container?
+- [ ] Why use `stop.store(true);` over plain `stop`?
 - [x] Print random quiet quote
 - [x] Read from a file
 - [x] Read live data in promiscuous mode
