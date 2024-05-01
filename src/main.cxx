@@ -146,6 +146,8 @@ auto capture2(std::string_view network_device) {
 
 int main() {
 
+  using namespace std::chrono_literals;
+
   std::print("Processing vendor file... ");
   auto oui = get_oui();
   std::println("{} vendors", oui.size());
@@ -161,8 +163,18 @@ int main() {
     return 1;
   }
 
+  std::vector<std::string> network_devices{};
+
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    std::println("\t{}", d->name);
+    network_devices.push_back(d->name);
+
+  assert(not std::empty(network_devices));
+
+  for (auto d : network_devices)
+    std::println("\t{}", d);
+
+  std::println("READY");
+  std::this_thread::sleep_for(2s);
 
   // Control the threads
   std::atomic_bool run{true};
@@ -176,7 +188,7 @@ int main() {
     while (run) {
 
       // Capture packets from each network device
-      auto dx = capture2("en0");
+      auto dx = capture2(network_devices[0]);
       {
         std::scoped_lock lock{mac_mutex};
 
@@ -193,9 +205,6 @@ int main() {
   }};
 
   //   std::vector<std::thread> threads;
-
-  using namespace std::chrono_literals;
-
   // Report MACs seen and packet count
   auto reporter = std::thread{[&]() {
     while (run) {
