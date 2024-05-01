@@ -21,7 +21,7 @@ struct device_t {
   size_t packet_length{};
   uint16_t packet_type{};
   std::string_view network{};
-  std::string ip{"____________"};
+  std::string ip{"------------"};
   std::string vendor{};
 };
 
@@ -51,27 +51,43 @@ auto capture(std::string_view network_device) {
     if (data == nullptr)
       continue;
 
-    // Extract MAC address
-    auto mac = std::string{};
-    for (auto i = size_t{6}; i < 12; ++i)
-      mac += std::format("{:02x}", data[i]) + "-";
-
     // Create a new device to describe this packet
-    auto device = device_t{.network = network_device};
+    auto device_source = device_t{.network = network_device};
+    auto device_dest = device_t{.network = network_device};
+
+    // Extract MAC addresses
+    auto mac_source = std::string{};
+    for (auto i = size_t{6}; i < 12; ++i)
+      mac_source += std::format("{:02x}", data[i]) + "-";
+
+    auto mac_dest = std::string{};
+    for (auto i = size_t{0}; i < 6; ++i)
+      mac_dest += std::format("{:02x}", data[i]) + "-";
 
     // Copy these data into the outgoing device
-    device.network = network_device;
-    device.packet_type = data[12] << 8 | data[13];
-    device.packet_length = header.len;
-    device.packets = 1;
+    device_source.network = network_device;
+    device_source.packet_type = data[12] << 8 | data[13];
+    device_source.packet_length = header.len;
+    device_source.packets = 1;
+
+    // Copy these data into the outgoing device
+    device_dest.network = network_device;
+    device_dest.packet_type = data[12] << 8 | data[13];
+    device_dest.packet_length = header.len;
+    device_dest.packets = 1;
 
     // Only set IP address if it's a suitable packet type
-    if (device.packet_type == 0x0800)
-      device.ip =
+    if (device_source.packet_type == 0x0800)
+      device_source.ip =
           std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
 
+    if (device_dest.packet_type == 0x0800)
+      device_dest.ip =
+          std::format("{}.{}.{}.{}", data[30], data[31], data[32], data[33]);
+
     // Add device to the list
-    devices.emplace(mac, device);
+    devices.emplace(mac_source, device_source);
+    devices.emplace(mac_dest, device_dest);
   }
 
   return devices;
@@ -170,7 +186,7 @@ int main() {
   });
 
   // Wait for a while
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(30 * 60s);
 
   // Request all threads stop
   run = false;
