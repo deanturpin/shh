@@ -13,7 +13,9 @@ std::map<std::string, std::string> get_oui() {
                          std::istreambuf_iterator<char>{}};
 
   // Parse each line
-  auto oui = std::map<std::string, std::string>{};
+  auto oui = std::map<std::string, std::string>{
+    {"f2-ed-07", "Huawei"},
+  };
 
   for (auto line : str | std::views::split('\n')) {
 
