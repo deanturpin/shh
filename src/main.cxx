@@ -14,20 +14,20 @@ namespace oui {
 std::string lookup(const std::string_view);
 }
 
-std::multimap<std::string, device_t> capture(std::string_view);
+namespace cap {
+std::multimap<std::string, device_t> read(std::string_view);
 std::vector<std::string> interfaces();
+} // namespace cap
 
 int main() {
 
   using namespace std::chrono_literals;
 
-  // List network interfaces
-  std::println("Network interfaces:");
-
-  auto network_interfaces = interfaces();
-
+  // Get network interfaces
+  auto network_interfaces = cap::interfaces();
   assert(not std::empty(network_interfaces));
 
+  std::println("Network interfaces:");
   for (auto d : network_interfaces)
     std::println("\t{}", d);
 
@@ -52,7 +52,7 @@ int main() {
       auto dev = network_interfaces.front();
 
       // Capture packets from the chosen network interface
-      auto dx = capture(dev);
+      auto dx = cap::read(dev);
 
       // Grab the devices container and update it
       {

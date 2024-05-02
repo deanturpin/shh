@@ -1,13 +1,14 @@
 #include "device.h"
+#include <format>
 #include <map>
 #include <pcap.h>
 #include <ranges>
-#include <format>
 #include <vector>
 
+namespace cap {
+
 // Capture packets from a single network interface
-std::multimap<std::string, device_t>
-capture(std::string_view network_interface) {
+std::multimap<std::string, device_t> read(std::string_view network_interface) {
 
   auto devices = std::multimap<std::string, device_t>{};
 
@@ -82,5 +83,6 @@ std::vector<std::string> interfaces() {
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
     network_interfaces.push_back(d->name);
 
-    return network_interfaces;
+  return network_interfaces;
 }
+} // namespace cap
