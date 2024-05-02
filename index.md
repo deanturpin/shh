@@ -6,19 +6,30 @@
 
 Command line monitoring and summarising of network traffic.
 
-## Requirements
+## Building and running in a Docker container
 
+```bash
+docker run -it --network host -v .:/run deanturpin/gcc make
+```
+
+Some documentation claims you need to use `--cap-add=NET_ADMIN`, but, I mean, it's working for me with just the `--network host` flag.
+
+## Tasks
+
+- [ ] Dump markdown summary to `stderr` on exit
+- [ ] Animate unknown IP addresses
+- [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
-- [ ] snoop number of packets on each interface
+- [ ] List number of packets on each interface (maybe in different threads?)
 - [ ] Show summary of packet types
 - [ ] Don't scroll display, jump to the top and overwrite
-- [ ] lock reporter for reading only (shared_mutex)
+- [ ] Lock reporter for reading only (shared_mutex)
 - [ ] Trial coroutines
-- [ ] Listen on all interfaces (maybe in different threads?)
-- [ ] Link to mermaid.live diagram of captured packets
+- [ ] Link to `mermaid.live` diagram of captured packets
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
 - [ ] How to deploy? Package or container?
 - [ ] Why use `stop.store(true);` over plain `stop`?
+- [x] Fix columns in output (with `std::print`?)
 - [x] List network interfaces
 - [x] Lookup MAC addresses in a vendor database
 - [x] Use threads

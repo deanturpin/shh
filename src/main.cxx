@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -13,7 +14,9 @@
 #include <vector>
 
 // Forward declarations
-std::map<std::string, std::string> get_oui();
+namespace oui {
+std::string lookup(const std::string_view);
+}
 
 // Information about devices
 struct device_t {
@@ -21,7 +24,7 @@ struct device_t {
   size_t packet_length{};
   uint16_t packet_type{};
   std::string_view network{};
-  std::string ip{"------------"};
+  std::string ip{};
   std::string vendor{};
 };
 
@@ -97,10 +100,6 @@ int main() {
 
   using namespace std::chrono_literals;
 
-  std::print("Processing vendor file... ");
-  auto oui = get_oui();
-  std::println("{} vendors", oui.size());
-
   // List network devices
   std::println("Network devices:");
 
@@ -139,15 +138,19 @@ int main() {
   threads.emplace_back([&]() {
     while (run) {
 
-      // Capture packets from each network device
-      auto dx = capture(network_devices[0]);
+      // If there's an "any" device then use it
+      // Otherwise the first one will do
+      auto it = std::ranges::find(network_devices, "any");
+      auto dev = it != network_devices.end() ? *it : *std::cbegin(network_devices);
+
+      // Capture packets from the chosen network device
+      auto dx = capture(dev);
 
       {
         std::scoped_lock lock{mac_mutex};
 
         // Add devices to the list
         for (auto [mac, device] : dx) {
-
           devices[mac].packets += device.packets;
           devices[mac].ip = device.ip;
         }
@@ -157,7 +160,7 @@ int main() {
     std::println("Sniffer stopped");
   });
 
-  // Report MACs seen and packet count
+  // Report devices seen and packet count
   threads.emplace_back([&]() {
     while (run) {
 
@@ -169,13 +172,17 @@ int main() {
       auto now_c = std::chrono::system_clock::to_time_t(now);
       std::println("{}", std::ctime(&now_c));
 
+      // Print markdown table header
+      std::println("| MAC | IP | Packets | Vendor |");
+      std::println("|-|-|-|-|");
+
       // Grab devices and print summary
       {
         std::scoped_lock lock{mac_mutex};
         for (auto [mac, device] : devices) {
-          auto vendor = oui.contains(mac.substr(0, 8)) ? oui[mac.substr(0, 8)]
-                                                       : mac + " unknown";
-          std::println("{}\t{}\t{}", device.ip, device.packets, vendor);
+          auto vendor = oui::lookup(mac);
+          std::println("| {} | {:15} | {:6} | {:30} |", mac.substr(0, 8),
+                       device.ip, device.packets, vendor);
         }
       }
 
@@ -186,13 +193,16 @@ int main() {
   });
 
   // Wait for a while
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(30 * 60s);
 
   // Request all threads stop
   run = false;
 
   // Wait for the threads to finish
-  for (auto &t : threads)
+  std::ranges::all_of(threads, [](auto &t) {
     if (t.joinable())
       t.join();
+
+    return true;
+  });
 }

@@ -4,6 +4,10 @@
 #include <ranges>
 #include <string>
 
+// Anonymous
+namespace {
+
+// Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 
   auto in = std::ifstream{"oui.txt"};
@@ -14,7 +18,7 @@ std::map<std::string, std::string> get_oui() {
 
   // Parse each line
   auto oui = std::map<std::string, std::string>{
-    {"f2-ed-07", "Huawei"},
+      {"f2-ed-07", "Nothing Technology Limited"},
   };
 
   for (auto line : str | std::views::split('\n')) {
@@ -44,3 +48,18 @@ std::map<std::string, std::string> get_oui() {
 
   return oui;
 }
+
+// Initialise the database on startup
+const auto database = get_oui();
+} // namespace
+
+// Lookup a MAC address in the database
+namespace oui {
+std::string lookup(const std::string_view mac) {
+
+  auto key = mac.substr(0, 8);
+  auto it = database.find(std::string{key});
+
+  return it != database.end() ? it->second : "";
+}
+} // namespace oui
