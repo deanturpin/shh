@@ -28,18 +28,18 @@ struct device_t {
   std::string vendor{};
 };
 
-// Capture packets from the given network device
-auto capture(std::string_view network_device) {
+// Capture packets from the given network interface
+auto capture(std::string_view network_interface) {
 
   auto devices = std::multimap<std::string, device_t>{};
 
-  // Open the network device in promiscuous mode
+  // Open the network interface in promiscuous mode
   char errbuf[256];
-  pcap_t *pcap = pcap_open_live(std::string{network_device}.c_str(), 65535, 1,
+  pcap_t *pcap = pcap_open_live(std::string{network_interface}.c_str(), 65535, 1,
                                 1000, errbuf);
 
   if (pcap == nullptr) {
-    std::println("Error opening network device: '{}'",
+    std::println("Error opening network interface: '{}'",
                  std::string_view(errbuf));
     return devices;
   }
@@ -55,8 +55,8 @@ auto capture(std::string_view network_device) {
       continue;
 
     // Create a new device to describe this packet
-    auto device_source = device_t{.network = network_device};
-    auto device_dest = device_t{.network = network_device};
+    auto device_source = device_t{.network = network_interface};
+    auto device_dest = device_t{.network = network_interface};
 
     // Extract MAC addresses
     auto mac_source = std::string{};
@@ -70,7 +70,7 @@ auto capture(std::string_view network_device) {
     auto packet_type = data[12] << 8 | data[13];
 
     // Copy these data into the outgoing device
-    device_source.network = device_dest.network = network_device;
+    device_source.network = device_dest.network = network_interface;
     device_source.packet_type = device_dest.packet_type = packet_type;
     device_source.packet_length = device_dest.packet_length = header.len;
     device_source.packets = device_dest.packets = 1;
@@ -93,8 +93,8 @@ int main() {
 
   using namespace std::chrono_literals;
 
-  // List network devices
-  std::println("Network devices:");
+  // List network interfaces
+  std::println("Network interfaces:");
 
   pcap_if_t *alldevs;
   char errbuf[256];
@@ -104,14 +104,14 @@ int main() {
     return 1;
   }
 
-  std::vector<std::string> network_devices{};
+  std::vector<std::string> network_interfaces{};
 
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    network_devices.push_back(d->name);
+    network_interfaces.push_back(d->name);
 
-  assert(not std::empty(network_devices));
+  assert(not std::empty(network_interfaces));
 
-  for (auto d : network_devices)
+  for (auto d : network_interfaces)
     std::println("\t{}", d);
 
   std::println("READY");
@@ -131,12 +131,10 @@ int main() {
   threads.emplace_back([&]() {
     while (run) {
 
-      // If there's an "any" device then use it
-      // Otherwise the first one will do
-      auto it = std::ranges::find(network_devices, "any");
-      auto dev = it != network_devices.end() ? *it : *std::cbegin(network_devices);
+      // Use only the first network interface
+      auto dev = network_interfaces.front();
 
-      // Capture packets from the chosen network device
+      // Capture packets from the chosen network interface
       auto dx = capture(dev);
 
       {
