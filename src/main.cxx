@@ -1,32 +1,29 @@
+#include "capture.h"
 #include "device.h"
-#include <algorithm>
+#include "oui.h"
 #include <atomic>
 #include <cassert>
+#include <chrono>
 #include <print>
 #include <thread>
-#include <chrono>
-#include "oui.h"
-#include "capture.h"
 
 int main() {
 
   using namespace std::chrono_literals;
 
-  // Get network interfaces
-  auto network_interfaces = cap::interfaces();
-  assert(not std::empty(network_interfaces));
-
+  // List all the network interfaces
   std::println("Network interfaces:");
-  for (auto d : network_interfaces)
-    std::println("\t{}", d);
+  auto network_interfaces = cap::interfaces();
 
-  std::println("READY");
-  std::this_thread::sleep_for(2s);
+  for (auto interface : network_interfaces)
+    std::println("\t{}", interface);
+
+  std::this_thread::sleep_for(1s);
 
   // Control the threads
   std::atomic_bool run{true};
 
-  // Shared MAC data
+  // Shared device data
   std::mutex mac_mutex;
   std::map<std::string, device_t> devices;
 
@@ -99,10 +96,7 @@ int main() {
   run = false;
 
   // Wait for the threads to finish
-  std::ranges::all_of(threads, [](auto &t) {
+  for (auto &t : threads)
     if (t.joinable())
       t.join();
-
-    return true;
-  });
 }

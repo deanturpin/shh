@@ -16,9 +16,9 @@ Some documentation claims you need to use `--cap-add=NET_ADMIN`, but, I mean, it
 
 ## Tasks
 
+- [ ] Refactor into one thread for reading packets and another for consolidating
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
 - [ ] Add schema for table
-- [x] pcap include should be limited to one file
 - [ ] Dump markdown summary to `stderr` on exit
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
@@ -32,6 +32,7 @@ Some documentation claims you need to use `--cap-add=NET_ADMIN`, but, I mean, it
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
 - [ ] How to deploy? Package or container?
 - [ ] Why use `stop.store(true);` over plain `stop`?
+- [x] pcap include should be limited to one file
 - [x] Fix columns in output (with `std::print`?)
 - [x] List network interfaces
 - [x] Lookup MAC addresses in a vendor database
@@ -76,26 +77,6 @@ LLDP (0x88CC): Indicates the payload is a Link Layer Discovery Protocol frame.
   // pcap_close(pcapHandle);
 
 // static_assert(not std::empty(get_quote());
-
-
-// // file header
-// struct pcap_file_header {
-//   std::uint32_t magic_number;  // Magic number
-//   std::uint16_t version_major; // Major version number
-//   std::uint16_t version_minor; // Minor version number
-//   std::int32_t thiszone;       // GMT to local correction
-//   std::uint32_t sigfigs;       // Accuracy of timestamps
-//   std::uint32_t snaplen;       // Max length of captured packets
-//   std::uint32_t network;       // Data link type
-// };
-
-// // packet header
-// struct pcap_packet_header {
-//   std::uint32_t ts_sec;   // Timestamp seconds
-//   std::uint32_t ts_usec;  // Timestamp microseconds
-//   std::uint32_t incl_len; // Number of octets of packet saved in file
-//   std::uint32_t orig_len; // Actual length of packet
-// };
 
 // std::atexit([]() {
 //   std::println("cya!");

@@ -31,8 +31,8 @@ std::multimap<std::string, device_t> read(std::string_view network_interface) {
       continue;
 
     // Create a new device to describe this packet
-    auto device_source = device_t{.network = network_interface};
-    auto device_dest = device_t{.network = network_interface};
+    auto device_source = device_t{};
+    auto device_dest = device_t{};
 
     // Extract MAC addresses
     auto mac_source = std::string{};
@@ -46,7 +46,6 @@ std::multimap<std::string, device_t> read(std::string_view network_interface) {
     auto packet_type = data[12] << 8 | data[13];
 
     // Copy these data into the outgoing device
-    device_source.network = device_dest.network = network_interface;
     device_source.packet_type = device_dest.packet_type = packet_type;
     device_source.packet_length = device_dest.packet_length = header.len;
     device_source.packets = device_dest.packets = 1;

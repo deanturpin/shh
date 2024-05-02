@@ -1,8 +1,8 @@
+#include "oui.h"
 #include <algorithm>
 #include <fstream>
 #include <map>
 #include <ranges>
-#include "oui.h"
 
 // Anonymous
 namespace {
