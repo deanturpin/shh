@@ -3,8 +3,9 @@
 #include <pcap.h>
 #include <ranges>
 #include <format>
+#include <vector>
 
-// Capture packets from the given network interface
+// Capture packets from a single network interface
 std::multimap<std::string, device_t>
 capture(std::string_view network_interface) {
 
@@ -63,4 +64,23 @@ capture(std::string_view network_interface) {
   }
 
   return devices;
+}
+
+// List all network interfaces
+std::vector<std::string> interfaces() {
+
+  pcap_if_t *alldevs;
+  char errbuf[256];
+
+  std::vector<std::string> network_interfaces{};
+
+  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    // std::println("Error in pcap_findalldevs: {}", errbuf);
+    return network_interfaces;
+  }
+
+  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+    network_interfaces.push_back(d->name);
+
+    return network_interfaces;
 }

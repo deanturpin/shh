@@ -4,7 +4,6 @@
 #include <cassert>
 #include <map>
 #include <mutex>
-#include <pcap.h>
 #include <print>
 #include <string>
 #include <thread>
@@ -16,6 +15,7 @@ std::string lookup(const std::string_view);
 }
 
 std::multimap<std::string, device_t> capture(std::string_view);
+std::vector<std::string> interfaces();
 
 int main() {
 
@@ -24,18 +24,7 @@ int main() {
   // List network interfaces
   std::println("Network interfaces:");
 
-  pcap_if_t *alldevs;
-  char errbuf[256];
-
-  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-    std::println("Error in pcap_findalldevs: {}", errbuf);
-    return 1;
-  }
-
-  std::vector<std::string> network_interfaces{};
-
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    network_interfaces.push_back(d->name);
+  auto network_interfaces = interfaces();
 
   assert(not std::empty(network_interfaces));
 
