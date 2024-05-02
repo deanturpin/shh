@@ -67,26 +67,19 @@ auto capture(std::string_view network_device) {
     for (auto i = size_t{0}; i < 6; ++i)
       mac_dest += std::format("{:02x}", data[i]) + "-";
 
-    // Copy these data into the outgoing device
-    device_source.network = network_device;
-    device_source.packet_type = data[12] << 8 | data[13];
-    device_source.packet_length = header.len;
-    device_source.packets = 1;
+    auto packet_type = data[12] << 8 | data[13];
 
     // Copy these data into the outgoing device
-    device_dest.network = network_device;
-    device_dest.packet_type = data[12] << 8 | data[13];
-    device_dest.packet_length = header.len;
-    device_dest.packets = 1;
+    device_source.network = device_dest.network = network_device;
+    device_source.packet_type = device_dest.packet_type = packet_type;
+    device_source.packet_length = device_dest.packet_length = header.len;
+    device_source.packets = device_dest.packets = 1;
 
     // Only set IP address if it's a suitable packet type
-    if (device_source.packet_type == 0x0800)
-      device_source.ip =
-          std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
-
-    if (device_dest.packet_type == 0x0800)
-      device_dest.ip =
-          std::format("{}.{}.{}.{}", data[30], data[31], data[32], data[33]);
+    if (packet_type == 0x0800) {
+      device_source.ip = std::format("{}.{}.{}.{}", data[26], data[27], data[28], data[29]);
+      device_dest.ip = std::format("{}.{}.{}.{}", data[30], data[31], data[32], data[33]);
+    }
 
     // Add device to the list
     devices.emplace(mac_source, device_source);
@@ -153,6 +146,7 @@ int main() {
         for (auto [mac, device] : dx) {
           devices[mac].packets += device.packets;
           devices[mac].ip = device.ip;
+          devices[mac].packet_type = device.packet_type;
         }
       }
     }
@@ -173,16 +167,16 @@ int main() {
       std::println("{}", std::ctime(&now_c));
 
       // Print markdown table header
-      std::println("| MAC | IP | Packets | Vendor |");
-      std::println("|-|-|-|-|");
+      std::println("| MAC | IP | Type | Packets | Vendor |");
+      std::println("|-|-|-|-|-|");
 
       // Grab devices and print summary
       {
         std::scoped_lock lock{mac_mutex};
         for (auto [mac, device] : devices) {
           auto vendor = oui::lookup(mac);
-          std::println("| {} | {:15} | {:6} | {:30} |", mac.substr(0, 8),
-                       device.ip, device.packets, vendor);
+          std::println("| {} | {:15} | {:04x} | {:6} | {:30} |", mac.substr(0, 8),
+                       device.ip, device.packet_type, device.packets, vendor);
         }
       }
 
@@ -193,7 +187,7 @@ int main() {
   });
 
   // Wait for a while
-  std::this_thread::sleep_for(30 * 60s);
+  std::this_thread::sleep_for(60s);
 
   // Request all threads stop
   run = false;
