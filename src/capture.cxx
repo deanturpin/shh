@@ -1,9 +1,8 @@
+#include "capture.h"
 #include "device.h"
 #include <format>
-#include <map>
 #include <pcap.h>
 #include <ranges>
-#include <vector>
 
 namespace cap {
 
@@ -74,10 +73,8 @@ std::vector<std::string> interfaces() {
 
   std::vector<std::string> network_interfaces{};
 
-  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
-    // std::println("Error in pcap_findalldevs: {}", errbuf);
+  if (pcap_findalldevs(&alldevs, errbuf) == -1)
     return network_interfaces;
-  }
 
   for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
     network_interfaces.push_back(d->name);

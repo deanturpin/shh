@@ -78,7 +78,7 @@ int main() {
         std::scoped_lock lock{mac_mutex};
         for (auto [mac, device] : devices) {
           auto vendor = oui::lookup(mac);
-          std::println("| {} | {:15} | {:04x} | {:6} | {:30} |",
+          std::println("| {} | {:15} | {:04x} | {:4} | {:30} |",
                        mac.substr(0, 8), device.ip, device.packet_type,
                        device.packets, vendor);
         }
