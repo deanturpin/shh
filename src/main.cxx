@@ -8,11 +8,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-
-// Forward declarations
-namespace oui {
-std::string lookup(const std::string_view);
-}
+#include "oui.h"
 
 namespace cap {
 std::multimap<std::string, device_t> read(std::string_view);
