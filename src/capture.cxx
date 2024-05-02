@@ -1,17 +1,8 @@
 #include "device.h"
-#include <algorithm>
-#include <atomic>
-#include <cassert>
-#include <chrono>
 #include <map>
-#include <mutex>
 #include <pcap.h>
 #include <ranges>
-#include <string.h>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <vector>
+#include <format>
 
 // Capture packets from the given network interface
 std::multimap<std::string, device_t>
