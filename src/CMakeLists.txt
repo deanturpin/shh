@@ -19,6 +19,8 @@ endif()
 project(wispa)
 add_executable(${PROJECT_NAME}
     main.cxx
-    oui.cxx)
+    oui.cxx
+    capture.cxx
+)
 
 target_link_libraries(${PROJECT_NAME} pcap)

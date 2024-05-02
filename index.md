@@ -17,6 +17,8 @@ Some documentation claims you need to use `--cap-add=NET_ADMIN`, but, I mean, it
 ## Tasks
 
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
+- [ ] Add schema for table
+- [ ] pcap include should be limited to one file
 - [ ] Dump markdown summary to `stderr` on exit
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it

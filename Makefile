@@ -16,4 +16,4 @@ oui.txt:
 	curl -O https://standards-oui.ieee.org/oui/oui.txt
 
 format:
-	clang-format -i src/*.cxx
+	clang-format -i src/*.cxx src/*.h
