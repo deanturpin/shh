@@ -2,18 +2,11 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
-#include <map>
-#include <mutex>
 #include <print>
-#include <string>
 #include <thread>
-#include <vector>
+#include <chrono>
 #include "oui.h"
-
-namespace cap {
-std::multimap<std::string, device_t> read(std::string_view);
-std::vector<std::string> interfaces();
-} // namespace cap
+#include "capture.h"
 
 int main() {
 
