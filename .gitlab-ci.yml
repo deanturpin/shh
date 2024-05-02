@@ -21,6 +21,12 @@ pages:
     # End code section
     - echo '```' | tee --append index.md
 
+    # Report some dev stats
+    - echo '## sloccount' | tee --append index.md
+    - echo '```' | tee --append index.md
+    - make stats | tee --append index.md
+    - echo '```' | tee --append index.md
+
     # Publish
     - mkdir public/
     - pandoc index.md --standalone -f gfm -t html5 --output public/index.html
