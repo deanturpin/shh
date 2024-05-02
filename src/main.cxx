@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cassert>
 #include <chrono>
+#include <mutex>
 #include <print>
 #include <thread>
 
