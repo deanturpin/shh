@@ -1,4 +1,5 @@
 #pragma once
+
 #include "device.h"
 #include <map>
 #include <string>

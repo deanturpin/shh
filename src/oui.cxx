@@ -57,9 +57,11 @@ const auto database = get_oui();
 namespace oui {
 std::string lookup(const std::string_view mac) {
 
+  // Chop off the end of the MAC address and look up the vendor part
   auto key = mac.substr(0, 8);
   auto it = database.find(std::string{key});
 
+  // Return the vendor name if found, or nothing. NOTHING
   return it != database.end() ? it->second : "";
 }
 } // namespace oui
