@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.28.3)
+cmake_minimum_required(VERSION 3.28)
 
-set(CMAKE_CXX_FLAGS "-std=c++23 -O1 -Wall -Wextra -Wpedantic -march=native")
+set(CMAKE_CXX_FLAGS "-std=c++23 -O1 -Wall -Wextra -Wpedantic -march=native -fexperimental-library")
 set(CMAKE_BUILD_TYPE Debug)
 
 if(APPLE)
