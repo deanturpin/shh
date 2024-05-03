@@ -1,87 +1,25 @@
-# Careless Wispa: loose lips sink ships
+# Careless Wispa
+
+Passive command line monitoring of network traffic.
 
 > Why did George Michael get chocolate on his pants? Because he was careless with his Wispa.
 
-## Passive network monitoring
+## Build and run
 
-Command line monitoring and summarising of network traffic.
+Developed with compilers built from source: g++ 15 and clang++ 19.
+
+```bash
+make
+```
 
 ## Building and running in a Docker container
+
+Using latest everything is not always possible so it can be run in an container. Of course, you need to expose your network to the container, which is considered a security risk by some.
 
 ```bash
 docker run -it --network host -v .:/run deanturpin/gcc make
 ```
 
-Some documentation claims you need to use `--cap-add=NET_ADMIN`, but, I mean, it's working for me with just the `--network host` flag.
-
-## Tasks
-
-- [ ] Refactor into one thread for reading packets and another for consolidating
-- [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
-- [ ] Add schema for table
-- [ ] Dump markdown summary to `stderr` on exit
-- [ ] Animate unknown IP addresses
-- [ ] Search for the OUI file in common locations, otherwise download it
-- [ ] Start typing to filter
-- [ ] List number of packets on each interface (maybe in different threads?)
-- [ ] Show summary of packet types
-- [ ] Don't scroll display, jump to the top and overwrite
-- [ ] Lock reporter for reading only (shared_mutex)
-- [ ] Trial coroutines
-- [ ] Link to `mermaid.live` diagram of captured packets
-- [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
-- [ ] How to deploy? Package or container?
-- [ ] Why use `stop.store(true);` over plain `stop`?
-- [x] pcap include should be limited to one file
-- [x] Fix columns in output (with `std::print`?)
-- [x] List network interfaces
-- [x] Lookup MAC addresses in a vendor database
-- [x] Use threads
-- [x] Print random quiet quote
-- [x] Read from a file
-- [x] Read live data in promiscuous mode
-- [x] Develop on macOS
-- [x] Use latest C++
-- [x] Use CMake
-- [x] Use latest clang
-
-<!--
-
-    // struct EthernetHeader {
-    //     uint8_t destMac[6];  // Destination MAC address
-    //     uint8_t srcMac[6];   // Source MAC address
-    //     uint16_t etherType;  // Ethernet type
-    // };
-
-IPv4 (0x0800): Indicates that the payload is an IPv4 packet.
-IPv6 (0x86DD): Indicates that the payload is an IPv6 packet.
-ARP (0x0806): Indicates that the payload is an ARP (Address Resolution Protocol) packet.
-VLAN Tagged Frame (0x8100): Indicates the presence of VLAN tagging.
-MPLS Unicast (0x8847): Indicates the presence of MPLS (Multiprotocol Label Switching) payload.
-MPLS Multicast (0x8848): Indicates the presence of MPLS payload for multicast packets.
-LLDP (0x88CC): Indicates the payload is a Link Layer Discovery Protocol frame.
-
-
-```
-
-  // // Set a filter (optional)
-  // struct bpf_program filter;
-  // pcap_compile(pcapHandle, &filter, "tcp port 80", 0, PCAP_NETMASK_UNKNOWN);
-  // pcap_setfilter(pcapHandsle, &filter);
-
-  // // Start capturing packets
-  // std::cout << "Capturing packets..." << std::endl;
-  // pcap_loop(pcapHandle, 0, packetHandler, nullptr);
-
-  // // Close the pcap handle when done
-  // pcap_close(pcapHandle);
-
-// static_assert(not std::empty(get_quote());
-
-// std::atexit([]() {
-//   std::println("cya!");
-//   return 0;
-// });
--->
+All looks nice but... it runs happily in the container but doesn't appear to capture the packet type; so the code to capture the IP never triggers. Some documentation claims you need to use `--cap-add=NET_ADMIN` but that' doesn't fix it. To be continued...
 
 ---
