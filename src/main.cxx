@@ -3,6 +3,7 @@
 #include "oui.h"
 #include <atomic>
 #include <cassert>
+#include <algorithm>
 #include <chrono>
 #include <mutex>
 #include <print>
@@ -35,8 +36,11 @@ int main() {
   threads.emplace_back([&]() {
     while (run) {
 
-      // Use only the first network interface
-      auto dev = network_interfaces.front();
+      // Is there's an "all" interface, use it
+      auto it = std::ranges::find(network_interfaces, "all");
+
+      // Otherwise use only the first network interface
+      auto interface = it != network_interfaces.end() ? "all" : network_interfaces.front();
 
       // Capture packets from the chosen network interface
       auto dx = cap::read(dev);
@@ -79,9 +83,22 @@ int main() {
         for (auto [mac, device] : devices) {
           auto vendor = oui::lookup(mac);
           std::println("| {} | {:15} | {:04x} | {:4} | {:30} |",
-                       mac.substr(0, 8), device.ip, device.packet_type,
+                       oui::prettify(mac), device.ip, device.packet_type,
                        device.packets, vendor);
         }
+
+        // Calculate number of each vendor
+        std::map<std::string, int> vendor_count;
+        for (auto [mac, device] : devices) {
+          auto vendor = oui::lookup(mac);
+          ++vendor_count[std::empty(vendor) ? "Unknown" : vendor];
+        }
+
+        // Print vendor summary
+        std::println("\n| Count | Vendor |");
+        std::println("|-|-|");
+        for (auto [vendor, count] : vendor_count)
+          std::println("| {:4} | {} |", count, vendor);
       }
 
       std::this_thread::sleep_for(1s);
