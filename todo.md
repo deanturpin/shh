@@ -9,6 +9,7 @@ This is the bit that doesn't move properly
     captures.emplace_back(interface);
 ```
 
+- install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] hide the threads and use parallel for_each
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop

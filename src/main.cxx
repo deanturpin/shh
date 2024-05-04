@@ -41,9 +41,9 @@ int main() {
     network_interfaces = {"any"};
 
   std::for_each(
-  // I cannot believe this isn't available for macOS clang 19
+// I cannot believe this isn't available for macOS clang 19
 #ifdef __linux__
-      std::execution::par,
+      std::execution::sequenced_policy,
 #endif
       std::begin(network_interfaces), std::end(network_interfaces),
       [&](auto &interface) {
