@@ -26,15 +26,15 @@ int main() {
   auto packets = std::vector<packet_t>{};
   packets.reserve(max_packets);
 
-  // Start capture progress thread
-  auto finished = std::async(std::launch::async, [&] {
-    while (run) {
-      std::println("Packets received: {}/{}", std::size(packets), max_packets);
-      std::this_thread::sleep_for(1s);
-    }
+  // // Start capture progress thread
+  // auto finished = std::async(std::launch::async, [&] {
+  //   while (run) {
+  //     std::println("Packets received: {}/{}", std::size(packets),
+  //     max_packets); std::this_thread::sleep_for(1s);
+  //   }
 
-    return true;
-  });
+  //   return true;
+  // });
 
   // Create container of threads
   auto threads = std::vector<std::thread>{};
@@ -67,7 +67,7 @@ int main() {
   }
 
   // Wait for the progress thread
-  finished.get();
+  // finished.get();
 
   for (auto &thread : threads)
     if (thread.joinable())

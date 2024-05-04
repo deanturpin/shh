@@ -16,6 +16,7 @@ This is the bit that doesn't move properly
 - [ ] create types header
 - [ ] Refactor into one thread for reading packets and another for consolidating
 
+- [ ] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
