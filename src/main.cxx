@@ -7,7 +7,6 @@
 #include <mutex>
 #include <print>
 #include <string>
-#include <thread>
 
 int main() {
   using namespace std::chrono_literals;
@@ -41,20 +40,18 @@ int main() {
                 "any") != std::end(network_interfaces))
     network_interfaces = {"any"};
 
-  // Create container of threads
-  auto threads = std::vector<std::thread>{};
-
-  // Start a thread for each network interface
-  for (auto &interface : network_interfaces) {
-    threads.emplace_back([&] {
-      {
+  std::for_each(
+  // I cannot believe this isn't available for macOS clang 19
+#ifdef __linux__
+      std::execution::par,
+#endif
+      std::begin(network_interfaces), std::end(network_interfaces),
+      [&](auto &interface) {
         // Create capture object
         auto cap = packet{interface};
 
-        std::println("Thread started for {}", interface);
-
+        // Read one packet at a time until the buffer is full
         while (run) {
-          // Read one packet
           auto packet = cap.read();
 
           // Check if the packet is empty
@@ -68,18 +65,11 @@ int main() {
               run = false;
           }
         }
-      }
+      });
 
-      std::println("Thread stopping for {}", interface);
-    });
-  }
-
-  // Wait for the progress thread
-  finished.get();
-
-  for (auto &thread : threads)
-    if (thread.joinable())
-      thread.join();
+  // Wait for the reporting thread to finish
+  auto confirm = finished.get();
+  assert(confirm);
 
   // Print the packets
   std::println("Packets received: {}", std::size(packets));
