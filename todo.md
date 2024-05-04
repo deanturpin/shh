@@ -9,6 +9,9 @@ This is the bit that doesn't move properly
     captures.emplace_back(interface);
 ```
 
+- [ ] retry building gcc
+- [ ] use syncstream instead
+- [ ] try gcc13 with fmtlib
 - [ ] How to static link? Does it mean it runs on Focal?
 - [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
