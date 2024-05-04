@@ -2,17 +2,38 @@
 
 ## Tasks
 
-- [ ] Make utilities `constexpr`
+This is the bit that doesn't move properly
+```cpp
+  auto captures = std::vector<packet>{};
+  for (auto &interface : network_interfaces)
+    captures.emplace_back(interface);
+```
+
+- install xcode - https://developer.apple.com/xcode/cpp/#c++23
+- Make utilities `constexpr`
+- [ ] hide the threads and use parallel for_each
+- [ ] move capture interfaces into packet class
+- [x] Ethernet header is common data structure
+- [x] Fill array of ethernet header and stop
+- [ ] assert macs are non-zero
+- [ ] create types header
+- [ ] Refactor into one thread for reading packets and another for consolidating
+
+- [ ] Review non-blocking logger thread
+- [ ] Add rate method (store last access time in class)
+- [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
+- [ ] Show summary of packet types alongside each interface
+- [ ] Report bits/second on each interface
+- [ ] Should the mac be in the device info?
+- [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
 - [ ] Version control
-- [ ] Refactor into one thread for reading packets and another for consolidating
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
 - [ ] Add schema for table
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
 - [ ] List number of packets on each interface (maybe in different threads?)
-- [ ] Show summary of packet types
 - [ ] Don't scroll display, jump to the top and overwrite
 - [ ] Lock reporter for reading only (shared_mutex)
 - [ ] Trial coroutines
@@ -33,6 +54,16 @@
 - [x] Use latest C++
 - [x] Use CMake
 - [x] Use latest clang
+
+## Mystery OUI
+
+```
+00-40-00   (hex)		PCI COMPONENTES DA AMZONIA LTD
+004000     (base 16)		PCI COMPONENTES DA AMZONIA LTD
+				RUA JOSEF KRYSS
+				  01140  BRASIL
+				BR
+```
 
 ## Snippets
 
