@@ -43,7 +43,7 @@ int main() {
 
   std::for_each(
 // I cannot believe this isn't available for macOS clang 19
-#ifdef __linux__
+#ifdef notnowthanks
       std::execution::sequenced_policy,
 #endif
       std::begin(network_interfaces), std::end(network_interfaces),

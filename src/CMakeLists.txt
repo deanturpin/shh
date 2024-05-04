@@ -21,7 +21,6 @@ add_executable(${PROJECT_NAME}
     main.cxx
     oui.cxx
     capture.cxx
-    packet.cxx
 )
 
 target_link_libraries(${PROJECT_NAME} pcap)

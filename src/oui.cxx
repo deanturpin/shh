@@ -104,9 +104,6 @@ std::string prettify(const std::string_view dirty) {
     pretty += ":";
   }
 
-  // auto blah = clean | std::views::split(2);
-  // auto blah2 = std::ranges::join_view{blah, ":"};
-
   // Remove the trailing colon
   pretty.pop_back();
 

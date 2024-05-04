@@ -10,7 +10,9 @@ This is the bit that doesn't move properly
 ```
 
 - install xcode - https://developer.apple.com/xcode/cpp/#c++23
+- Make utilities `constexpr`
 - [ ] hide the threads and use parallel for_each
+- [ ] move capture interfaces into packet class
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop
 - [ ] assert macs are non-zero
@@ -24,7 +26,6 @@ This is the bit that doesn't move properly
 - [ ] Report bits/second on each interface
 - [ ] Should the mac be in the device info?
 - [ ] unique pointers for pcap bits
-- [ ] Make utilities `constexpr`
 - [ ] Dump markdown summary on exit
 - [ ] Version control
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
