@@ -15,9 +15,6 @@ int main() {
   // Control the threads
   std::atomic_bool run{true};
 
-  // Get all network interfaces
-  auto network_interfaces = cap::interfaces();
-
   // Stop after this many packets
   constexpr auto max_packets = 10;
 
@@ -26,15 +23,21 @@ int main() {
   auto packets = std::vector<packet_t>{};
   packets.reserve(max_packets);
 
-  // // Start capture progress thread
-  // auto finished = std::async(std::launch::async, [&] {
-  //   while (run) {
-  //     std::println("Packets received: {}/{}", std::size(packets),
-  //     max_packets); std::this_thread::sleep_for(1s);
-  //   }
+  // Start capture progress thread
+  auto finished = std::async(std::launch::async, [&] {
+    while (run) {
+      std::println("Packets received: {}/{}", std::size(packets), max_packets);
+      std::this_thread::sleep_for(1s);
+    }
 
-  //   return true;
-  // });
+    return true;
+  });
+
+  // Get all network interfaces
+  auto network_interfaces = cap::interfaces();
+
+  for (auto &interface : network_interfaces)
+    std::println("Interface: {}", interface);
 
   // Create container of threads
   auto threads = std::vector<std::thread>{};
@@ -43,8 +46,14 @@ int main() {
   for (auto &interface : network_interfaces) {
     threads.emplace_back([&] {
       {
+        // Skip "any" interface
+        if (interface != "any")
+          return;
+
         // Create capture object
         auto cap = packet{interface};
+
+        std::println("Thread started for {}", interface);
 
         while (run) {
           // Read one packet
@@ -53,8 +62,9 @@ int main() {
           // Check if the packet is empty
           if (not std::empty(packet.source.mac)) {
 
+            std::scoped_lock lock{packets_mutex};
+
             if (std::size(packets) < max_packets) {
-              std::scoped_lock lock{packets_mutex};
               packets.push_back(packet);
             } else
               run = false;
@@ -67,7 +77,7 @@ int main() {
   }
 
   // Wait for the progress thread
-  // finished.get();
+  finished.get();
 
   for (auto &thread : threads)
     if (thread.joinable())
