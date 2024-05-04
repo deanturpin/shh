@@ -2,6 +2,7 @@
 
 ## Tasks
 
+- [ ] hide the threads and use parallel for_each
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop
 - [ ] assert macs are non-zero

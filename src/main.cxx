@@ -18,7 +18,7 @@ int main() {
   auto network_interfaces = cap::interfaces();
 
   // Stop after this many packets
-  constexpr auto max_packets = 1000;
+  constexpr auto max_packets = 100;
 
   // Shared data structure for packets
   auto packets_mutex = std::mutex{};
@@ -45,11 +45,8 @@ int main() {
             if (std::size(packets) < max_packets) {
               std::scoped_lock lock{packets_mutex};
               packets.push_back(packet);
-            } else {
+            } else
               run = false;
-            }
-          } else {
-            // std::this_thread::sleep_for(1s);
           }
         }
       }
@@ -60,9 +57,8 @@ int main() {
 
   // Print interface counts
   while (run) {
-    std::this_thread::sleep_for(1s);
-    std::print("\033[2J\033[1;1H");
     std::println("Packets received: {}", std::size(packets));
+    std::this_thread::sleep_for(1s);
   }
 
   for (auto &thread : threads)
