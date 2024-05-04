@@ -1,5 +1,7 @@
 # Careless Wispa
 
+[![](https://gitlab.com/deanturpin/wispa/badges/main/pipeline.svg)](https://gitlab.com/deanturpin/wispa/-/pipelines)
+
 Passive command line monitoring of network traffic.
 
 > Why did George Michael get chocolate on his pants? Because he was careless with his Wispa.
