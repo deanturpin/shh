@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
-#include <execution>
 #include <future>
 #include <mutex>
 #include <print>
