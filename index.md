@@ -12,9 +12,7 @@ See [the repo](https://gitlab.com/deanturpin/wispa).
 
 Developed with compilers built from source: g++ 15 and clang++ 19.
 
-```bash
-make
-```
+Just clone the repo and type `make`, which invokes all the usual CMake commands and runs the exe.
 
 ## Building and running in a Docker container
 
