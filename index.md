@@ -19,9 +19,9 @@ Just clone the repo and run `make`, which invokes all the usual CMake commands a
 Using "latest everything" is not always possible so it can be run in an container. Of course you need to expose your network to the container, which is considered a security risk by some.
 
 ```bash
-docker run -it --network host -v .:/run deanturpin/gcc make
+$ docker run -it --network host -v .:/run deanturpin/gcc make
 ```
 
-All looks nice... and it runs happily in the container... but it doesn't appear to capture the packet type; which makes parsing the packet a little tricky. Some documentation claims you need to use `--cap-add=NET_ADMIN` but that' doesn't fix it. To be continued.
+All looks nice... and it runs happily in the container... but it doesn't appear to capture the packet type; which makes parsing the packet a little tricky. Some documentation claims you need to use `--cap-add=NET_ADMIN` but that doesn't fix it. _To be continued._
 
 ---

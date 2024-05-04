@@ -12,6 +12,7 @@ This is the bit that doesn't move properly
 - [ ] How to static link? Does it mean it runs on Focal?
 - [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
+- [ ] build and debug in Docker/VSCode
 - [x] hide the threads and use parallel for_each
 - [x] move capture interfaces into packet class
 - [x] Ethernet header is common data structure
