@@ -4,6 +4,7 @@
 #include <string>
 
 // Shared data structure for devices seen on the network
+// See: dependency inversion principle
 struct packet_t {
 
   // The interface the packet was captured on
@@ -13,7 +14,7 @@ struct packet_t {
   struct {
     std::string mac{};
     std::string ip{};
-  } source, destination;
+  } source{}, destination{};
 
   // Type of the packet: TCP, UDP, ICMP
   uint16_t type{};

@@ -1,6 +1,6 @@
-#include "capture.h"
 #include "oui.h"
-#include "packet2.h"
+#include "packet.h"
+#include "types.h"
 #include <algorithm>
 #include <atomic>
 #include <execution>
@@ -49,7 +49,7 @@ int main() {
       std::begin(network_interfaces), std::end(network_interfaces),
       [&](auto &interface) {
         // Create capture object
-        auto cap = packet{interface};
+        auto cap = cap::packet{interface};
 
         // Read one packet at a time until the buffer is full
         while (run) {
