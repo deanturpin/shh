@@ -36,8 +36,10 @@ int main() {
   // Get all network interfaces
   auto network_interfaces = cap::interfaces();
 
-  for (auto &interface : network_interfaces)
-    std::println("Interface: {}", interface);
+  // If there's an "any" interface, just use that
+  if (std::find(std::begin(network_interfaces), std::end(network_interfaces),
+                "any") != std::end(network_interfaces))
+    network_interfaces = {"any"};
 
   // Create container of threads
   auto threads = std::vector<std::thread>{};
@@ -46,10 +48,6 @@ int main() {
   for (auto &interface : network_interfaces) {
     threads.emplace_back([&] {
       {
-        // Skip "any" interface
-        if (interface != "any")
-          return;
-
         // Create capture object
         auto cap = packet{interface};
 
