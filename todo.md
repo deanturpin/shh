@@ -2,6 +2,13 @@
 
 ## Tasks
 
+This is the bit that doesn't move properly
+```cpp
+  auto captures = std::vector<packet>{};
+  for (auto &interface : network_interfaces)
+    captures.emplace_back(interface);
+```
+
 - [ ] hide the threads and use parallel for_each
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop
@@ -44,6 +51,16 @@
 - [x] Use latest C++
 - [x] Use CMake
 - [x] Use latest clang
+
+## Mystery OUI
+
+```
+00-40-00   (hex)		PCI COMPONENTES DA AMZONIA LTD
+004000     (base 16)		PCI COMPONENTES DA AMZONIA LTD
+				RUA JOSEF KRYSS
+				  01140  BRASIL
+				BR
+```
 
 ## Snippets
 

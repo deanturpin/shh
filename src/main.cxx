@@ -3,6 +3,7 @@
 #include "packet2.h"
 #include <algorithm>
 #include <atomic>
+#include <future>
 #include <mutex>
 #include <print>
 #include <string>
@@ -18,12 +19,22 @@ int main() {
   auto network_interfaces = cap::interfaces();
 
   // Stop after this many packets
-  constexpr auto max_packets = 100;
+  constexpr auto max_packets = 10;
 
   // Shared data structure for packets
   auto packets_mutex = std::mutex{};
   auto packets = std::vector<packet_t>{};
   packets.reserve(max_packets);
+
+  // Start capture progress thread
+  auto finished = std::async([&] {
+    while (run) {
+      std::println("Packets received: {}/{}", std::size(packets), max_packets);
+      std::this_thread::sleep_for(1s);
+    }
+
+    return true;
+  });
 
   // Create container of threads
   auto threads = std::vector<std::thread>{};
@@ -55,11 +66,8 @@ int main() {
     });
   }
 
-  // Print interface counts
-  while (run) {
-    std::println("Packets received: {}", std::size(packets));
-    std::this_thread::sleep_for(1s);
-  }
+  // Wait for the progress thread
+  finished.get();
 
   for (auto &thread : threads)
     if (thread.joinable())
