@@ -27,7 +27,7 @@ int main() {
   packets.reserve(max_packets);
 
   // Start capture progress thread
-  auto finished = std::async([&] {
+  auto finished = std::async(std::launch::async, [&] {
     while (run) {
       std::println("Packets received: {}/{}", std::size(packets), max_packets);
       std::this_thread::sleep_for(1s);
