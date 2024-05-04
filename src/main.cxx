@@ -3,6 +3,7 @@
 #include "types.h"
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <execution>
 #include <future>
 #include <mutex>
@@ -20,7 +21,7 @@ int main() {
 
   // Shared data structure for packets
   auto packets_mutex = std::mutex{};
-  auto packets = std::vector<packet_t>{};
+  auto packets = std::vector<ethernet_packet_t>{};
   packets.reserve(max_packets);
 
   // Start capture progress thread
@@ -53,15 +54,15 @@ int main() {
 
         // Read one packet at a time until the buffer is full
         while (run) {
-          auto packet = cap.read();
+          auto pac = cap.read();
 
           // Check if the packet is empty
-          if (not std::empty(packet.source.mac)) {
+          if (not std::empty(pac.source.mac)) {
 
             std::scoped_lock lock{packets_mutex};
 
             if (std::size(packets) < max_packets) {
-              packets.push_back(packet);
+              packets.push_back(pac);
             } else
               run = false;
           }

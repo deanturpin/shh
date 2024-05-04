@@ -9,22 +9,23 @@ This is the bit that doesn't move properly
     captures.emplace_back(interface);
 ```
 
-- install xcode - https://developer.apple.com/xcode/cpp/#c++23
-- Make utilities `constexpr`
-- [ ] hide the threads and use parallel for_each
-- [ ] move capture interfaces into packet class
+- [ ] How to static link? Does it mean it runs on Focal?
+- [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
+- [ ] Make utilities `constexpr`
+- [x] hide the threads and use parallel for_each
+- [x] move capture interfaces into packet class
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop
 - [ ] assert macs are non-zero
-- [ ] create types header
+- [x] create types header
 - [ ] Refactor into one thread for reading packets and another for consolidating
-
 - [ ] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
 - [ ] Report bits/second on each interface
 - [ ] Should the mac be in the device info?
+- [ ] use apt oui if on Debian
 - [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
 - [ ] Version control

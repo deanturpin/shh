@@ -5,7 +5,7 @@
 
 // Shared data structure for devices seen on the network
 // See: dependency inversion principle
-struct packet_t {
+struct ethernet_packet_t {
 
   // The interface the packet was captured on
   std::string interface{};
