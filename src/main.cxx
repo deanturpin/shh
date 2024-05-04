@@ -1,120 +1,87 @@
 #include "capture.h"
-#include "device.h"
 #include "oui.h"
-#include <atomic>
-#include <cassert>
+#include "packet2.h"
 #include <algorithm>
-#include <chrono>
+#include <atomic>
 #include <mutex>
 #include <print>
+#include <string>
 #include <thread>
 
 int main() {
-
   using namespace std::chrono_literals;
-
-  // List all the network interfaces
-  std::println("Network interfaces:");
-  auto network_interfaces = cap::interfaces();
-
-  for (auto interface : network_interfaces)
-    std::println("\t{}", interface);
-
-  std::this_thread::sleep_for(1s);
 
   // Control the threads
   std::atomic_bool run{true};
 
-  // Shared device data
-  std::mutex mac_mutex;
-  std::map<std::string, device_t> devices;
+  // Get all network interfaces
+  auto network_interfaces = cap::interfaces();
 
-  // Create container for all threads
-  std::vector<std::thread> threads;
+  // Stop after this many packets
+  constexpr auto max_packets = 1000;
 
-  // Search for MAC addresses
-  threads.emplace_back([&]() {
-    while (run) {
+  // Shared data structure for packets
+  auto packets_mutex = std::mutex{};
+  auto packets = std::vector<packet_t>{};
+  packets.reserve(max_packets);
 
-      // Is there's an "all" interface, use it
-      auto it = std::ranges::find(network_interfaces, "all");
+  // Create container of threads
+  auto threads = std::vector<std::thread>{};
 
-      // Otherwise use only the first network interface
-      auto interface = it != network_interfaces.end() ? "all" : network_interfaces.front();
-
-      // Capture packets from the chosen network interface
-      auto dx = cap::read(dev);
-
-      // Grab the devices container and update it
+  // Start a thread for each network interface
+  for (auto &interface : network_interfaces) {
+    threads.emplace_back([&] {
       {
-        std::scoped_lock lock{mac_mutex};
+        // Create capture object
+        auto cap = packet{interface};
 
-        // Add devices to the list
-        for (auto [mac, device] : dx) {
-          devices[mac].packets += device.packets;
-          devices[mac].ip = device.ip;
-          devices[mac].packet_type = device.packet_type;
+        while (run) {
+          // Read one packet
+          auto packet = cap.read();
+
+          // Check if the packet is empty
+          if (not std::empty(packet.source.mac)) {
+
+            if (std::size(packets) < max_packets) {
+              std::scoped_lock lock{packets_mutex};
+              packets.push_back(packet);
+            } else {
+              run = false;
+            }
+          } else {
+            // std::this_thread::sleep_for(1s);
+          }
         }
       }
-    }
 
-    std::println("Sniffer stopped");
-  });
+      std::println("Thread stopping for {}", interface);
+    });
+  }
 
-  // Report devices seen and packet count
-  threads.emplace_back([&]() {
-    while (run) {
+  // Print interface counts
+  while (run) {
+    std::this_thread::sleep_for(1s);
+    std::print("\033[2J\033[1;1H");
+    std::println("Packets received: {}", std::size(packets));
+  }
 
-      // Clear terminal
-      std::print("\033[2J\033[1;1H");
+  for (auto &thread : threads)
+    if (thread.joinable())
+      thread.join();
 
-      // Print current time
-      auto now = std::chrono::system_clock::now();
-      auto now_c = std::chrono::system_clock::to_time_t(now);
-      std::println("{}", std::ctime(&now_c));
+  // Print the packets
+  std::println("Packets received: {}", std::size(packets));
+  for (auto &packet : packets) {
 
-      // Print markdown table header
-      std::println("| MAC | IP | Type | Packets | Vendor |");
-      std::println("|-|-|-|-|-|");
+    // Resolve the vendors or just print the MAC address
+    auto source_vendor = oui::lookup(packet.source.mac);
+    auto dest_vendor = oui::lookup(packet.destination.mac);
 
-      // Grab the devices container and print summary
-      {
-        std::scoped_lock lock{mac_mutex};
-        for (auto [mac, device] : devices) {
-          auto vendor = oui::lookup(mac);
-          std::println("| {} | {:15} | {:04x} | {:4} | {:30} |",
-                       oui::prettify(mac), device.ip, device.packet_type,
-                       device.packets, vendor);
-        }
+    std::println("{:6} {:04x} {} > {}", packet.interface, packet.type,
+                 std::empty(source_vendor) ? packet.source.mac : source_vendor,
+                 std::empty(dest_vendor) ? packet.destination.mac
+                                         : dest_vendor);
+  }
 
-        // Calculate number of each vendor
-        std::map<std::string, int> vendor_count;
-        for (auto [mac, device] : devices) {
-          auto vendor = oui::lookup(mac);
-          ++vendor_count[std::empty(vendor) ? "Unknown" : vendor];
-        }
-
-        // Print vendor summary
-        std::println("\n| Count | Vendor |");
-        std::println("|-|-|");
-        for (auto [vendor, count] : vendor_count)
-          std::println("| {:4} | {} |", count, vendor);
-      }
-
-      std::this_thread::sleep_for(1s);
-    }
-
-    std::println("Reporter stopped");
-  });
-
-  // Wait for a while
-  std::this_thread::sleep_for(60s);
-
-  // Request all threads stop
-  run = false;
-
-  // Wait for the threads to finish
-  for (auto &t : threads)
-    if (t.joinable())
-      t.join();
+  std::println("goodnight");
 }

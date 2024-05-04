@@ -2,17 +2,27 @@
 
 ## Tasks
 
+- [x] Ethernet header is common data structure
+- [x] Fill array of ethernet header and stop
+- [ ] assert macs are non-zero
+- [ ] create types header
+- [ ] Refactor into one thread for reading packets and another for consolidating
+
+- [ ] Add rate method (store last access time in class)
+- [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
+- [ ] Show summary of packet types alongside each interface
+- [ ] Report bits/second on each interface
+- [ ] Should the mac be in the device info?
+- [ ] unique pointers for pcap bits
 - [ ] Make utilities `constexpr`
 - [ ] Dump markdown summary on exit
 - [ ] Version control
-- [ ] Refactor into one thread for reading packets and another for consolidating
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
 - [ ] Add schema for table
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
 - [ ] List number of packets on each interface (maybe in different threads?)
-- [ ] Show summary of packet types
 - [ ] Don't scroll display, jump to the top and overwrite
 - [ ] Lock reporter for reading only (shared_mutex)
 - [ ] Trial coroutines

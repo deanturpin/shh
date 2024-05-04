@@ -34,12 +34,12 @@ std::multimap<std::string, device_t> read(std::string_view network_interface) {
     auto device_dest = device_t{};
 
     struct ethernet_header {
-      uint8_t destMac[6];  // Destination MAC address
-      uint8_t srcMac[6];   // Source MAC address
-      uint16_t etherType;  // Ethernet type
+      uint8_t destMac[6]; // Destination MAC address
+      uint8_t srcMac[6];  // Source MAC address
+      uint16_t etherType; // Ethernet type
     };
 
-    auto eth_header = reinterpret_cast<ethernet_header const * const>(data);
+    auto eth_header = reinterpret_cast<ethernet_header const *const>(data);
 
     // Extract MAC addresses
     auto mac_source = std::format("{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",

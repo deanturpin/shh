@@ -9,4 +9,4 @@ std::string lookup(const std::string_view);
 
 // Pretty print a MAC address
 std::string prettify(const std::string_view);
-}
+} // namespace oui
