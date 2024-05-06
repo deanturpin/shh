@@ -6,7 +6,7 @@
 namespace cap {
 
 // Only constructor allowed
-packet::packet(std::string_view interface) {
+packet_t::packet_t(std::string_view interface) {
 
   interface_ = interface;
 
@@ -16,13 +16,13 @@ packet::packet(std::string_view interface) {
 }
 
 // RAII destructor
-packet::~packet() {
+packet_t::~packet_t() {
   if (pcap_ != nullptr)
     pcap_close(pcap_);
 }
 
 // Read a single packet from the interface
-ethernet_packet_t packet::read() {
+ethernet_packet_t packet_t::read() {
   pcap_pkthdr header;
   const u_char *data = pcap_next(pcap_, &header);
 

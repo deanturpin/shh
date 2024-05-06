@@ -12,7 +12,7 @@ namespace cap {
 std::vector<std::string> interfaces();
 
 // RAII wrapper for a capture interface
-class packet {
+class packet_t {
 
   // Name of the network interface
   std::string interface_{};
@@ -22,20 +22,20 @@ class packet {
 
 public:
   // Start capture on a single interface
-  explicit packet(std::string_view);
+  explicit packet_t(std::string_view);
 
   // Only explicit constructor allowed
-  packet() noexcept = delete;
-  packet(const packet &) noexcept = delete;
-  packet(packet &&) noexcept = delete;
-  packet &operator=(const packet &) noexcept = delete;
-  packet &operator=(packet &&) noexcept = delete;
+  packet_t() noexcept = delete;
+  packet_t(const packet_t &) noexcept = delete;
+  packet_t(packet_t &&) noexcept = delete;
+  packet_t &operator=(const packet_t &) noexcept = delete;
+  packet_t &operator=(packet_t &&) noexcept = delete;
 
   // Read a single packet from the interface
   ethernet_packet_t read();
 
   // RAII destructor
-  ~packet();
+  ~packet_t();
 };
 
 } // namespace cap
