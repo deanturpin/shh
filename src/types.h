@@ -19,3 +19,17 @@ struct ethernet_packet_t {
   // Type of the packet: TCP, UDP, ICMP
   uint16_t type_{};
 };
+
+// IPv4 structure
+struct ip_header_t {
+  uint8_t version_ihl_;
+  uint8_t dscp_ecn_;
+  uint16_t total_length_;
+  uint16_t identification_;
+  uint16_t flags_fragment_offset_;
+  uint8_t ttl_;
+  uint8_t protocol_;
+  uint16_t checksum_;
+  uint8_t source_ip_[4];
+  uint8_t dest_ip_[4];
+};

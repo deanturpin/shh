@@ -57,14 +57,19 @@ ethernet_packet_t packet_t::read() {
   auto ip_source = std::string{};
   auto ip_dest = std::string{};
 
-  if (eth->packet_type_ > 0) {
-    ip_source = std::format(
-        "{}.{}.{}.{}", static_cast<int>(data[26]), static_cast<int>(data[27]),
-        static_cast<int>(data[28]), static_cast<int>(data[29]));
+  static_assert(sizeof(ip_header_t) == 20);
 
-    ip_dest = std::format(
-        "{}.{}.{}.{}", static_cast<int>(data[30]), static_cast<int>(data[31]),
-        static_cast<int>(data[32]), static_cast<int>(data[33]));
+  // Get the IPs if it's an IPv4 packet
+  if (eth->packet_type_ == 0x0008) {
+
+    auto ip =
+        reinterpret_cast<const ip_header_t *>(data + sizeof(ethernet_header_t));
+
+    ip_source = std::format("{}.{}.{}.{}", ip->source_ip_[0], ip->source_ip_[1],
+                            ip->source_ip_[2], ip->source_ip_[3]);
+
+    ip_dest = std::format("{}.{}.{}.{}", ip->dest_ip_[0], ip->dest_ip_[1],
+                          ip->dest_ip_[2], ip->dest_ip_[3]);
   }
 
   return {

@@ -28,8 +28,6 @@ int main() {
           << std::format("Packets received: {}\n", std::size(packets));
       std::this_thread::sleep_for(1s);
     }
-
-    std::osyncstream{std::cout} << std::format("Progress thread finished\n");
   });
 
   // Get all network interfaces
@@ -46,26 +44,20 @@ int main() {
   for (auto interface : network_interfaces) {
     threads.emplace_back(
         [&](std::stop_token token, std::string interface) {
-          std::osyncstream{std::cout}
-              << std::format("Capturing on interface: {}\n", interface);
-
           // Create capture object
-          auto cap = cap::packet_t{interface};
+          auto capture = cap::packet_t{interface};
 
           // Capture until stop is requested
           while (not token.stop_requested()) {
 
             // Read a packet
-            auto pac = cap.read();
+            auto packet = capture.read();
 
             // Store if it's valid
             std::scoped_lock lock{packets_mutex};
-            if (not std::empty(pac.source_.mac_))
-              packets.push_back(pac);
+            if (not std::empty(packet.source_.mac_))
+              packets.push_back(packet);
           }
-
-          std::osyncstream{std::cout} << std::format(
-              "Finished capturing on interface: {}\n", interface);
         },
         interface);
   }

@@ -14,17 +14,18 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
-- [ ] Download something large rather than ping (or maybe apt update?)
+- [ ] Does libpcap have all the headers structures?
+- [x] Download something large rather than ping (or maybe apt update?)
 - [ ] use reference rather than pointer for memory mapping
 - [ ] retry building gcc
-- [ ] try gcc13 with fmtlib
+- [x] try gcc13 with fmtlib
 - [ ] How to static link? Does it mean it runs on Focal?
 - [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
 - [ ] assert macs are non-zero
 - [ ] build and debug in Docker/VSCode
-- [ ] Refactor into one thread for reading packets and another for consolidating
-- [ ] Review non-blocking logger thread
+- [x] Refactor into one thread for reading packets and another for consolidating
+- [x] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
@@ -32,8 +33,8 @@ This is the bit that doesn't move properly
 - [ ] use apt oui if on Debian
 - [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
-- [ ] Version control
-- [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
+- [ ] Version reporting (git tag, cmake version)
+- [x] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
