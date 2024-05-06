@@ -77,18 +77,14 @@ ethernet_packet_t packet_t::read() {
 // List all network interfaces
 std::vector<std::string> interfaces() {
 
-  // Create container for network interfaces
   std::vector<std::string> network_interfaces{};
 
   // Find all network interfaces
   pcap_if_t *alldevs;
   char errbuf[256];
-  if (pcap_findalldevs(&alldevs, errbuf) == -1)
-    return network_interfaces;
-
-  // Convert to strings
-  for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-    network_interfaces.push_back(d->name);
+  if (pcap_findalldevs(&alldevs, errbuf) >= 0)
+    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+      network_interfaces.push_back(d->name);
 
   return network_interfaces;
 }

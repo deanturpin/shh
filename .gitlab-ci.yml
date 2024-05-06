@@ -5,13 +5,15 @@ pages:
   artifacts: {paths: [public]}
   script:
 
+    - apt update
+    - apt install --yes nmap
+
     # Start code section
     - date | tee --append index.md
     - echo '```' | tee --append index.md
 
-    # Create some traffic in the background
-    - echo pinging in the background to create some traffic...
-    - ping -c 200 turpin.dev& 2>/dev/null
+    # Create some network traffic in the background
+    - nmap -A turpin.dev &
 
     # Build and run
     - make | tee --append index.md
