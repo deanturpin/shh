@@ -17,8 +17,10 @@ packet_t::packet_t(std::string_view interface) {
 
 // RAII destructor
 packet_t::~packet_t() {
-  if (pcap_ != nullptr)
+  if (pcap_ != nullptr) {
     pcap_close(pcap_);
+    pcap_ = nullptr;
+  }
 }
 
 // Read a single packet from the interface
