@@ -53,10 +53,23 @@ ethernet_packet_t packet_t::read() {
                   eth->destination_mac_[2], eth->destination_mac_[3],
                   eth->destination_mac_[4], eth->destination_mac_[5]);
 
+  auto ip_source = std::string{};
+  auto ip_dest = std::string{};
+
+  if (eth->packet_type_ > 0) {
+    ip_source = std::format(
+        "{}.{}.{}.{}", static_cast<int>(data[26]), static_cast<int>(data[27]),
+        static_cast<int>(data[28]), static_cast<int>(data[29]));
+
+    ip_dest = std::format(
+        "{}.{}.{}.{}", static_cast<int>(data[30]), static_cast<int>(data[31]),
+        static_cast<int>(data[32]), static_cast<int>(data[33]));
+  }
+
   return {
       .interface_ = interface_,
-      .source_ = {.mac_ = mac_source},
-      .destination_ = {.mac_ = mac_dest},
+      .source_ = {.mac_ = mac_source, .ip_ = ip_source},
+      .destination_ = {.mac_ = mac_dest, .ip_ = ip_dest},
       .type_ = eth->packet_type_,
   };
 }

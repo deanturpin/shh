@@ -71,7 +71,7 @@ int main() {
   }
 
   // Capture packets for a while
-  std::this_thread::sleep_for(20s);
+  std::this_thread::sleep_for(60s);
 
   // Stop all the threads
   for (auto &thread : threads)
@@ -85,8 +85,9 @@ int main() {
     auto dest_vendor = oui::lookup(packet.destination_.mac_);
 
     std::osyncstream{std::cout} << std::format(
-        "{:6} {:04x} {} > {}\n", packet.interface_, packet.type_,
+        "{:6} {:04x} {} > {} | {} > {}\n", packet.interface_, packet.type_,
         std::empty(source_vendor) ? packet.source_.mac_ : source_vendor,
-        std::empty(dest_vendor) ? packet.destination_.mac_ : dest_vendor);
+        std::empty(dest_vendor) ? packet.destination_.mac_ : dest_vendor,
+        packet.source_.ip_, packet.destination_.ip_);
   }
 }
