@@ -54,7 +54,7 @@ ethernet_packet_t packet_t::read() {
   return {
       .interface_ = interface_,
       .source_ = {.mac_ = mac_source},
-      .destination = {.mac_ = mac_dest},
+      .destination_ = {.mac_ = mac_dest},
       .type_ = eth->packet_type_,
   };
 }

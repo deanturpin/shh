@@ -83,12 +83,12 @@ int main() {
 
     // Resolve the vendors or just print the MAC address
     auto source_vendor = oui::lookup(packet.source_.mac_);
-    auto dest_vendor = oui::lookup(packet.destination.mac_);
+    auto dest_vendor = oui::lookup(packet.destination_.mac_);
 
     std::osyncstream{std::cout} << std::format(
         "{:6} {:04x} {} > {}\n", packet.interface_, packet.type_,
         std::empty(source_vendor) ? packet.source_.mac_ : source_vendor,
-        std::empty(dest_vendor) ? packet.destination.mac_ : dest_vendor);
+        std::empty(dest_vendor) ? packet.destination_.mac_ : dest_vendor);
   }
 
   std::osyncstream{std::cout} << std::format("goodnight\n");
