@@ -80,6 +80,16 @@ ethernet_packet_t packet_t::read() {
   };
 }
 
+// Make assertions about the class
+static_assert(not std::is_default_constructible_v<packet_t>);
+static_assert(not std::is_copy_constructible_v<packet_t>);
+static_assert(not std::is_copy_assignable_v<packet_t>);
+static_assert(not std::is_move_constructible_v<packet_t>);
+static_assert(not std::is_move_assignable_v<packet_t>);
+static_assert(std::is_destructible_v<packet_t>);
+static_assert(std::is_constructible_v<packet_t, std::string_view>);
+static_assert(not std::has_virtual_destructor_v<packet_t>);
+
 // List all network interfaces
 std::set<std::string> interfaces() {
 

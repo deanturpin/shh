@@ -4,7 +4,7 @@ all: oui.txt
 	build/wispa
 
 entr:
-	ls Makefile src/* | entr -cr make
+	ls Makefile src/* | entr -cr make --silent
 
 stats:
 	sloccount bin/ src/*.cxx src/CMakeLists.txt Makefile | grep -E "SLOC|Cost"
