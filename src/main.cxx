@@ -4,10 +4,12 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <format>
 #include <future>
+#include <iostream>
 #include <mutex>
-#include <print>
 #include <string>
+#include <syncstream>
 
 int main() {
   using namespace std::chrono_literals;
@@ -26,7 +28,8 @@ int main() {
   // Start capture progress thread
   auto finished = std::async(std::launch::async, [&] {
     while (run) {
-      std::println("Packets received: {}/{}", std::size(packets), max_packets);
+      std::osyncstream{std::cout} << std::format(
+          "Packets received: {}/{}\n", std::size(packets), max_packets);
       std::this_thread::sleep_for(1s);
     }
 
@@ -73,18 +76,20 @@ int main() {
   assert(confirm);
 
   // Print the packets
-  std::println("Packets received: {}", std::size(packets));
+  std::osyncstream{std::cout}
+      << std::format("Packets received: {}\n", std::size(packets));
+
   for (auto &packet : packets) {
 
     // Resolve the vendors or just print the MAC address
     auto source_vendor = oui::lookup(packet.source.mac);
     auto dest_vendor = oui::lookup(packet.destination.mac);
 
-    std::println("{:6} {:04x} {} > {}", packet.interface, packet.type,
-                 std::empty(source_vendor) ? packet.source.mac : source_vendor,
-                 std::empty(dest_vendor) ? packet.destination.mac
-                                         : dest_vendor);
+    std::osyncstream{std::cout} << std::format(
+        "{:6} {:04x} {} > {}\n", packet.interface, packet.type,
+        std::empty(source_vendor) ? packet.source.mac : source_vendor,
+        std::empty(dest_vendor) ? packet.destination.mac : dest_vendor);
   }
 
-  std::println("goodnight");
+  std::osyncstream{std::cout} << std::format("goodnight\n");
 }
