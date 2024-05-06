@@ -63,13 +63,13 @@ ethernet_packet_t packet_t::read() {
 
 // List all network interfaces
 std::vector<std::string> interfaces() {
-  pcap_if_t *alldevs;
-  char errbuf[256];
 
   // Create container for network interfaces
   std::vector<std::string> network_interfaces{};
 
   // Find all network interfaces
+  pcap_if_t *alldevs;
+  char errbuf[256];
   if (pcap_findalldevs(&alldevs, errbuf) == -1)
     return network_interfaces;
 

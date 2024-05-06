@@ -23,25 +23,17 @@ This is the bit that doesn't move properly
 - [ ] Make utilities `constexpr`
 - [ ] assert macs are non-zero
 - [ ] build and debug in Docker/VSCode
-- [x] hide the threads and use parallel for_each
-- [x] move capture interfaces into packet class
-- [x] Ethernet header is common data structure
-- [x] Fill array of ethernet header and stop
-- [x] create types header
-- [x] use syncstream instead
 - [ ] Refactor into one thread for reading packets and another for consolidating
 - [ ] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
 - [ ] Report bits/second on each interface
-- [ ] Should the mac be in the device info?
 - [ ] use apt oui if on Debian
 - [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
 - [ ] Version control
 - [ ] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
-- [ ] Add schema for table
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
@@ -53,6 +45,13 @@ This is the bit that doesn't move properly
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
 - [ ] How to deploy? Package or container?
 - [ ] Why use `stop.store(true);` over plain `stop`?
+- [x] hide the threads and use parallel for_each
+- [x] move capture interfaces into packet class
+- [x] Ethernet header is common data structure
+- [x] Fill array of ethernet header and stop
+- [x] create types header
+- [x] use syncstream instead
+- [x] Should the mac be in the device info?
 - [x] Totals for each vendor
 - [x] pcap include should be limited to one file
 - [x] Fix columns in output (with `std::print`?)
