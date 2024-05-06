@@ -36,9 +36,9 @@ int main() {
   auto network_interfaces = cap::interfaces();
 
   // If there's an "any" interface, just use that
-  if (std::ranges::find(network_interfaces, "any") !=
-      std::end(network_interfaces))
-    network_interfaces = {"any"};
+  constexpr auto catch_all = "any";
+  if (network_interfaces.contains(catch_all))
+    network_interfaces = {catch_all};
 
   assert(not std::empty(network_interfaces));
 
@@ -79,7 +79,6 @@ int main() {
 
   // Print the packets
   for (auto &packet : packets) {
-
     // Resolve the vendors or just print the MAC address
     auto source_vendor = oui::lookup(packet.source_.mac_);
     auto dest_vendor = oui::lookup(packet.destination_.mac_);

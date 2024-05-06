@@ -1,6 +1,5 @@
 #include "packet.h"
 #include "types.h"
-#include <cassert>
 #include <format>
 
 namespace cap {
@@ -77,16 +76,16 @@ ethernet_packet_t packet_t::read() {
 }
 
 // List all network interfaces
-std::vector<std::string> interfaces() {
+std::set<std::string> interfaces() {
 
-  std::vector<std::string> network_interfaces{};
+  std::set<std::string> network_interfaces{};
 
   // Find all network interfaces
   pcap_if_t *alldevs;
   char errbuf[256];
   if (pcap_findalldevs(&alldevs, errbuf) >= 0)
     for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-      network_interfaces.push_back(d->name);
+      network_interfaces.emplace(d->name);
 
   return network_interfaces;
 }

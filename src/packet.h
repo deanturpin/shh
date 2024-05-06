@@ -3,13 +3,14 @@
 #include "packet.h"
 #include "types.h"
 #include <pcap.h>
+#include <set>
 #include <string>
 #include <vector>
 
 namespace cap {
 
 // List all network interfaces
-std::vector<std::string> interfaces();
+std::set<std::string> interfaces();
 
 // RAII wrapper for a capture interface
 class packet_t {
