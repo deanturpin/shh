@@ -5,9 +5,6 @@ pages:
   artifacts: {paths: [public]}
   script:
 
-    - apt update
-    - apt install --yes libpcap-dev iputils-ping sloccount
-
     # Start code section
     - date | tee --append index.md
     - echo '```' | tee --append index.md
