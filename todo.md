@@ -10,18 +10,18 @@ This is the bit that doesn't move properly
 ```
 
 - [ ] retry building gcc
-- [ ] use syncstream instead
 - [ ] try gcc13 with fmtlib
 - [ ] How to static link? Does it mean it runs on Focal?
 - [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
+- [ ] assert macs are non-zero
 - [ ] build and debug in Docker/VSCode
 - [x] hide the threads and use parallel for_each
 - [x] move capture interfaces into packet class
 - [x] Ethernet header is common data structure
 - [x] Fill array of ethernet header and stop
-- [ ] assert macs are non-zero
 - [x] create types header
+- [x] use syncstream instead
 - [ ] Refactor into one thread for reading packets and another for consolidating
 - [ ] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
