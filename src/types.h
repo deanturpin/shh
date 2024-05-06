@@ -8,7 +8,7 @@
 struct ethernet_packet_t {
 
   // The interface the packet was captured on
-  std::string interface{};
+  std::string interface_{};
 
   // Source and destination devices
   struct {

@@ -86,7 +86,7 @@ int main() {
     auto dest_vendor = oui::lookup(packet.destination.mac);
 
     std::osyncstream{std::cout} << std::format(
-        "{:6} {:04x} {} > {}\n", packet.interface, packet.type,
+        "{:6} {:04x} {} > {}\n", packet.interface_, packet.type,
         std::empty(source_vendor) ? packet.source.mac : source_vendor,
         std::empty(dest_vendor) ? packet.destination.mac : dest_vendor);
   }

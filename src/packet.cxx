@@ -40,7 +40,7 @@ ethernet_packet_t packet::read() {
                   eth->destMac[4], eth->destMac[5]);
 
   return {
-      .interface = interface_,
+      .interface_ = interface_,
       .source = {.mac = mac_source},
       .destination = {.mac = mac_dest},
       .type = eth->etherType,
