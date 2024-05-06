@@ -5,6 +5,7 @@
 #include <format>
 #include <iostream>
 #include <mutex>
+#include <ranges>
 #include <string>
 #include <syncstream>
 #include <thread>

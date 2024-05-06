@@ -4,13 +4,11 @@ set(CMAKE_CXX_FLAGS "-std=c++23 -O1 -Wall -Wextra -Wpedantic -march=native")
 set(CMAKE_BUILD_TYPE Debug)
 
 if(APPLE)
-    # clang for macOS
-    set(CMAKE_CXX_COMPILER /usr/local/bin/clang++)
-    set(CMAKE_C_COMPILER /usr/local/bin/clang)
+    # Don't use the default: clang
+    set(CMAKE_CXX_COMPILER /opt/homebrew/bin/g++-13)
+    set(CMAKE_C_COMPILER /opt/homebrew/bin/gcc-13)
 elseif(LINUX)
-    # gnu for Linux
-    set(CMAKE_CXX_COMPILER /usr/local/bin/g++)
-    set(CMAKE_C_COMPILER /usr/local/bin/gcc)
+    # Let cmake find it
 else()
     # godspeed
     message(WARNING "Platform unknown")
