@@ -14,6 +14,7 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+- [ ] dns lookup for IP addresses
 - [ ] Does libpcap have all the headers structures?
 - [x] Download something large rather than ping (or maybe apt update?)
 - [ ] use reference rather than pointer for memory mapping

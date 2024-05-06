@@ -14,8 +14,8 @@
 int main() {
   using namespace std::chrono_literals;
 
-  // Shared data structure for packets
-  auto packets_mutex = std::mutex{};
+  // Shared data structure for stored packets
+  auto packet_mutex = std::mutex{};
   auto packets = std::vector<ethernet_packet_t>{};
 
   // Thread pool
@@ -25,23 +25,23 @@ int main() {
   threads.emplace_back([&](std::stop_token token) {
     while (not token.stop_requested()) {
       std::osyncstream{std::cout}
-          << std::format("Packets received: {}\n", std::size(packets));
+          << std::format("Packets processed: {}\n", std::size(packets));
       std::this_thread::sleep_for(1s);
     }
   });
 
   // Get all network interfaces
-  auto network_interfaces = cap::interfaces();
+  auto interfaces = cap::interfaces();
 
   // If there's an "any" interface, just use that
   constexpr auto catch_all = "any";
-  if (network_interfaces.contains(catch_all))
-    network_interfaces = {catch_all};
+  if (interfaces.contains(catch_all))
+    interfaces = {catch_all};
 
-  assert(not std::empty(network_interfaces));
+  assert(not std::empty(interfaces));
 
   // Start a thread to capture on each interface
-  for (auto interface : network_interfaces) {
+  for (auto interface : interfaces) {
     threads.emplace_back(
         [&](std::stop_token token, std::string interface) {
           // Create capture object
@@ -53,8 +53,8 @@ int main() {
             // Read a packet
             auto packet = capture.read();
 
-            // Store if it's valid
-            std::scoped_lock lock{packets_mutex};
+            // And store it if valid
+            std::scoped_lock lock{packet_mutex};
             if (not std::empty(packet.source_.mac_))
               packets.push_back(packet);
           }

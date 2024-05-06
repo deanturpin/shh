@@ -27,10 +27,30 @@ auto sanitise(std::string_view str) {
 }
 
 // Tidy up a MAC address into just the vendor part
-auto mac_to_vendor(const std::string_view mac) {
+std::string mac_to_vendor(const std::string_view mac) {
   auto key = strip(mac);
-  return key.substr(0, 6);
+  return std::string{key.begin(), key.end()}.substr(0, 6);
 }
+
+// Remove leading and trailing whitespace
+constexpr std::string_view trim_whitespace(std::string_view path) {
+  const size_t start = path.find_first_not_of(" ");
+  const size_t end = path.find_last_not_of(" ");
+  const size_t diff = end - start;
+  return diff > 0uz ? path.substr(start, diff + 1) : "";
+}
+
+static_assert(trim_whitespace("") == "");
+static_assert(trim_whitespace(" ") == "");
+static_assert(trim_whitespace("                 ") == "");
+static_assert(trim_whitespace("     file.jpg    ") == "file.jpg");
+static_assert(trim_whitespace("file.jpg    ") == "file.jpg");
+static_assert(trim_whitespace("     file.jpg") == "file.jpg");
+static_assert(trim_whitespace("     one two    ") == "one two");
+static_assert(trim_whitespace(std::string{"     one two    "}) == "one two");
+static_assert(trim_whitespace(std::string_view{"     one two    "}) ==
+              "one two");
+static_assert(trim_whitespace("\n") == "");
 
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
