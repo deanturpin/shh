@@ -1,40 +1,34 @@
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
-#include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <format>
-#include <future>
 #include <iostream>
 #include <mutex>
 #include <string>
 #include <syncstream>
 #include <thread>
+#include <vector>
 
 int main() {
   using namespace std::chrono_literals;
 
-  // Control the threads
-  std::atomic_bool run{true};
-
-  // Stop after this many packets
-  constexpr auto max_packets = 50;
-
   // Shared data structure for packets
   auto packets_mutex = std::mutex{};
   auto packets = std::vector<ethernet_packet_t>{};
-  packets.reserve(max_packets);
 
-  // Start capture progress thread
-  auto finished = std::async(std::launch::async, [&] {
-    while (run) {
-      std::osyncstream{std::cout} << std::format(
-          "Packets received: {}/{}\n", std::size(packets), max_packets);
+  // Thread pool
+  auto threads = std::vector<std::jthread>{};
+
+  // Create progress thread
+  threads.emplace_back([&](std::stop_token token) {
+    while (not token.stop_requested()) {
+      std::osyncstream{std::cout}
+          << std::format("Packets received: {}\n", std::size(packets));
       std::this_thread::sleep_for(1s);
     }
 
-    return true;
+    std::osyncstream{std::cout} << std::format("Progress thread finished\n");
   });
 
   // Get all network interfaces
@@ -45,31 +39,28 @@ int main() {
       std::end(network_interfaces))
     network_interfaces = {"any"};
 
-  auto threads = std::vector<std::jthread>{};
+  assert(not std::empty(network_interfaces));
 
+  // Start a thread to capture on each interface
   for (auto interface : network_interfaces) {
     threads.emplace_back(
-        [&](std::string interface) {
+        [&](std::stop_token token, std::string interface) {
           std::osyncstream{std::cout}
               << std::format("Capturing on interface: {}\n", interface);
 
           // Create capture object
           auto cap = cap::packet_t{interface};
 
-          // Read one packet at a time until the buffer is full
-          while (run) {
+          // Capture until stop is requested
+          while (not token.stop_requested()) {
+
+            // Read a packet
             auto pac = cap.read();
 
-            // Check if the packet is empty
-            if (not std::empty(pac.source_.mac_)) {
-
-              std::scoped_lock lock{packets_mutex};
-
-              if (std::size(packets) < max_packets) {
-                packets.push_back(pac);
-              } else
-                run = false;
-            }
+            // Store if it's valid
+            std::scoped_lock lock{packets_mutex};
+            if (not std::empty(pac.source_.mac_))
+              packets.push_back(pac);
           }
 
           std::osyncstream{std::cout} << std::format(
@@ -78,14 +69,14 @@ int main() {
         interface);
   }
 
-  // Wait for the reporting thread to finish
-  auto confirm = finished.get();
-  assert(confirm);
+  // Capture packets for a while
+  std::this_thread::sleep_for(10s);
+
+  // Stop all the threads
+  for (auto &thread : threads)
+    thread.request_stop();
 
   // Print the packets
-  std::osyncstream{std::cout}
-      << std::format("Packets received: {}\n", std::size(packets));
-
   for (auto &packet : packets) {
 
     // Resolve the vendors or just print the MAC address
@@ -97,6 +88,4 @@ int main() {
         std::empty(source_vendor) ? packet.source_.mac_ : source_vendor,
         std::empty(dest_vendor) ? packet.destination_.mac_ : dest_vendor);
   }
-
-  std::osyncstream{std::cout} << std::format("goodnight\n");
 }
