@@ -20,30 +20,33 @@ ethernet_packet_t packet::read() {
   if (data == nullptr)
     return {};
 
-  struct ethernet_header {
-    uint8_t destMac[6]; // Destination MAC address
-    uint8_t srcMac[6];  // Source MAC address
-    uint16_t etherType; // Ethernet type
+  // Structure of the first part of the packet
+  struct ethernet_header_t {
+    uint8_t destination_mac_[6];
+    uint8_t source_mac_[6];
+    uint16_t packet_type_;
   };
 
   // Map these data into the header structure
-  auto eth = reinterpret_cast<const ethernet_header *>(data);
+  auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
   // Extract the MAC addresses
   auto mac_source = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                                eth->srcMac[0], eth->srcMac[1], eth->srcMac[2],
-                                eth->srcMac[3], eth->srcMac[4], eth->srcMac[5]);
+                                eth->source_mac_[0], eth->source_mac_[1],
+                                eth->source_mac_[2], eth->source_mac_[3],
+                                eth->source_mac_[4], eth->source_mac_[5]);
 
   auto mac_dest =
-      std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", eth->destMac[0],
-                  eth->destMac[1], eth->destMac[2], eth->destMac[3],
-                  eth->destMac[4], eth->destMac[5]);
+      std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+                  eth->destination_mac_[0], eth->destination_mac_[1],
+                  eth->destination_mac_[2], eth->destination_mac_[3],
+                  eth->destination_mac_[4], eth->destination_mac_[5]);
 
   return {
       .interface_ = interface_,
       .source = {.mac = mac_source},
       .destination = {.mac = mac_dest},
-      .type = eth->etherType,
+      .type = eth->packet_type_,
   };
 }
 

@@ -9,7 +9,13 @@ This is the bit that doesn't move properly
     captures.emplace_back(interface);
 ```
 
+```cpp
+  ethernet_header &eth2 =
+      *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
+```
+
 - [ ] Download something large rather than ping (or maybe apt update?)
+- [ ] use reference rather than pointer for memory mapping
 - [ ] retry building gcc
 - [ ] try gcc13 with fmtlib
 - [ ] How to static link? Does it mean it runs on Focal?
@@ -69,11 +75,6 @@ This is the bit that doesn't move properly
 				RUA JOSEF KRYSS
 				  01140  BRASIL
 				BR
-
-en0    0000 DATAPOINT CORPORATION > 12:80:00:40:01:00
-en0    0000 DATAPOINT CORPORATION > 1e:81:00:40:01:00
-en0    0000 DATAPOINT CORPORATION > e6:81:00:40:01:00
-en0    0000 DU PONT PIXEL SYSTEMS     . > 3a:82:00:40:01:00
 ```
 
 ## Snippets
