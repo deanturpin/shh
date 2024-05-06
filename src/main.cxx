@@ -18,7 +18,7 @@ int main() {
   std::atomic_bool run{true};
 
   // Stop after this many packets
-  constexpr auto max_packets = 10;
+  constexpr auto max_packets = 50;
 
   // Shared data structure for packets
   auto packets_mutex = std::mutex{};
