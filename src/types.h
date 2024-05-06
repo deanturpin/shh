@@ -17,5 +17,5 @@ struct ethernet_packet_t {
   } source_{}, destination{};
 
   // Type of the packet: TCP, UDP, ICMP
-  uint16_t type{};
+  uint16_t type_{};
 };
