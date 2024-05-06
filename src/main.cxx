@@ -59,7 +59,7 @@ int main() {
           auto pac = cap.read();
 
           // Check if the packet is empty
-          if (not std::empty(pac.source.mac)) {
+          if (not std::empty(pac.source_.mac_)) {
 
             std::scoped_lock lock{packets_mutex};
 
@@ -82,13 +82,13 @@ int main() {
   for (auto &packet : packets) {
 
     // Resolve the vendors or just print the MAC address
-    auto source_vendor = oui::lookup(packet.source.mac);
-    auto dest_vendor = oui::lookup(packet.destination.mac);
+    auto source_vendor = oui::lookup(packet.source_.mac_);
+    auto dest_vendor = oui::lookup(packet.destination.mac_);
 
     std::osyncstream{std::cout} << std::format(
         "{:6} {:04x} {} > {}\n", packet.interface_, packet.type,
-        std::empty(source_vendor) ? packet.source.mac : source_vendor,
-        std::empty(dest_vendor) ? packet.destination.mac : dest_vendor);
+        std::empty(source_vendor) ? packet.source_.mac_ : source_vendor,
+        std::empty(dest_vendor) ? packet.destination.mac_ : dest_vendor);
   }
 
   std::osyncstream{std::cout} << std::format("goodnight\n");

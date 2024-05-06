@@ -5,17 +5,26 @@
 
 namespace cap {
 
+// Only constructor allowed
+packet::packet(std::string_view interface) {
+
+  interface_ = interface;
+
+  char errbuf[256];
+  pcap_ =
+      pcap_open_live(std::string{interface}.c_str(), 65535, 1, 1000, errbuf);
+}
+
 // RAII destructor
 packet::~packet() {
-  if (pcap != nullptr)
-    pcap_close(pcap);
+  if (pcap_ != nullptr)
+    pcap_close(pcap_);
 }
 
 // Read a single packet from the interface
 ethernet_packet_t packet::read() {
-
   pcap_pkthdr header;
-  const u_char *data = pcap_next(pcap, &header);
+  const u_char *data = pcap_next(pcap_, &header);
 
   if (data == nullptr)
     return {};
@@ -44,15 +53,14 @@ ethernet_packet_t packet::read() {
 
   return {
       .interface_ = interface_,
-      .source = {.mac = mac_source},
-      .destination = {.mac = mac_dest},
+      .source_ = {.mac_ = mac_source},
+      .destination = {.mac_ = mac_dest},
       .type = eth->packet_type_,
   };
 }
 
 // List all network interfaces
 std::vector<std::string> interfaces() {
-
   pcap_if_t *alldevs;
   char errbuf[256];
 

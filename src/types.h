@@ -12,9 +12,9 @@ struct ethernet_packet_t {
 
   // Source and destination devices
   struct {
-    std::string mac{};
-    std::string ip{};
-  } source{}, destination{};
+    std::string mac_{};
+    std::string ip_{};
+  } source_{}, destination{};
 
   // Type of the packet: TCP, UDP, ICMP
   uint16_t type{};
