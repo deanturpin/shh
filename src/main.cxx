@@ -10,6 +10,7 @@
 #include <mutex>
 #include <string>
 #include <syncstream>
+#include <thread>
 
 int main() {
   using namespace std::chrono_literals;
@@ -40,36 +41,42 @@ int main() {
   auto network_interfaces = cap::interfaces();
 
   // If there's an "any" interface, just use that
-  if (std::find(std::begin(network_interfaces), std::end(network_interfaces),
-                "any") != std::end(network_interfaces))
+  if (std::ranges::find(network_interfaces, "any") !=
+      std::end(network_interfaces))
     network_interfaces = {"any"};
 
-  std::for_each(
-// I cannot believe this isn't available for macOS clang 19
-#ifdef notnowthanks
-      std::execution::sequenced_policy,
-#endif
-      std::begin(network_interfaces), std::end(network_interfaces),
-      [&](auto &interface) {
-        // Create capture object
-        auto cap = cap::packet_t{interface};
+  auto threads = std::vector<std::jthread>{};
 
-        // Read one packet at a time until the buffer is full
-        while (run) {
-          auto pac = cap.read();
+  for (auto interface : network_interfaces) {
+    threads.emplace_back(
+        [&](std::string interface) {
+          std::osyncstream{std::cout}
+              << std::format("Capturing on interface: {}\n", interface);
 
-          // Check if the packet is empty
-          if (not std::empty(pac.source_.mac_)) {
+          // Create capture object
+          auto cap = cap::packet_t{interface};
 
-            std::scoped_lock lock{packets_mutex};
+          // Read one packet at a time until the buffer is full
+          while (run) {
+            auto pac = cap.read();
 
-            if (std::size(packets) < max_packets) {
-              packets.push_back(pac);
-            } else
-              run = false;
+            // Check if the packet is empty
+            if (not std::empty(pac.source_.mac_)) {
+
+              std::scoped_lock lock{packets_mutex};
+
+              if (std::size(packets) < max_packets) {
+                packets.push_back(pac);
+              } else
+                run = false;
+            }
           }
-        }
-      });
+
+          std::osyncstream{std::cout} << std::format(
+              "Finished capturing on interface: {}\n", interface);
+        },
+        interface);
+  }
 
   // Wait for the reporting thread to finish
   auto confirm = finished.get();
