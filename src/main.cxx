@@ -2,7 +2,6 @@
 #include "packet.h"
 #include "types.h"
 #include <cassert>
-#include <execution>
 #include <format>
 #include <iostream>
 #include <mutex>
@@ -43,12 +42,6 @@ int main() {
 
   assert(not std::empty(network_interfaces));
 
-  std::for_each(std::execution::par, std::begin(network_interfaces),
-                std::end(network_interfaces), [](auto &interface) {
-                  std::osyncstream{std::cout}
-                      << std::format("Interface: {}\n", interface);
-                });
-
   // Start a thread to capture on each interface
   for (auto interface : network_interfaces) {
     threads.emplace_back(
@@ -78,7 +71,7 @@ int main() {
   }
 
   // Capture packets for a while
-  std::this_thread::sleep_for(10s);
+  std::this_thread::sleep_for(20s);
 
   // Stop all the threads
   for (auto &thread : threads)
