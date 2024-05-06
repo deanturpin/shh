@@ -31,12 +31,14 @@ ethernet_packet_t packet_t::read() {
   if (data == nullptr)
     return {};
 
-  // Structure of the first part of the packet
+  // Structure of the first part of the  packet
   struct ethernet_header_t {
     uint8_t destination_mac_[6];
     uint8_t source_mac_[6];
     uint16_t packet_type_;
   };
+
+  static_assert(sizeof(ethernet_header_t) == 14);
 
   // Map these data into the header structure
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
