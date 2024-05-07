@@ -1,10 +1,12 @@
 #include "oui.h"
 #include <algorithm>
 #include <cassert>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <ranges>
+#include <syncstream>
 
 // Anonymous
 namespace {
@@ -33,8 +35,19 @@ auto sanitise(std::string_view str) {
   return key;
 }
 
+constexpr bool is_valid(std::string_view mac) {
+  return std::size(mac) > 5 and std::size(mac) < 18;
+}
+
 // Tidy up a MAC address into just the vendor part
 std::string mac_to_vendor(std::string_view dirty) {
+
+  if (not is_valid(dirty)) {
+    std::osyncstream{std::cout}
+        << std::format("Invalid MAC address skipped: {}\n", dirty);
+    // abort();
+    return {};
+  }
 
   // Tidy up the incoming MAC address
   auto clean = strip(sanitise(dirty));
@@ -42,8 +55,10 @@ std::string mac_to_vendor(std::string_view dirty) {
 
   if (std::size(vendor) != 6) {
 
-    std::cout << "Invalid MAC address: " << dirty << std::endl;
-    abort();
+    std::cout << std::format("Invalid MAC address: {} {}\n", dirty,
+                             std::size(vendor));
+    assert(false);
+    return {};
   }
 
   assert(std::size(vendor) < 7);
