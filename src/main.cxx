@@ -64,7 +64,7 @@ int main() {
       std::this_thread::sleep_for(1s);
 
       std::osyncstream{std::cout}
-          << std::format("Packets per second: {}\n", std::size(packets));
+          << std::format("\nPackets per second: {}\n", std::size(packets));
 
       // Process the packets
       std::scoped_lock lock{packet_mutex};
