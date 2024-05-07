@@ -23,15 +23,6 @@ int main() {
   // Thread pool
   auto threads = std::vector<std::jthread>{};
 
-  // Create progress thread
-  threads.emplace_back([&](std::stop_token token) {
-    while (not token.stop_requested()) {
-      std::osyncstream{std::cout}
-          << std::format("Packets processed: {}\n", std::size(packets));
-      std::this_thread::sleep_for(1s);
-    }
-  });
-
   // Get all network interfaces
   auto interfaces = cap::interfaces();
 
@@ -64,35 +55,35 @@ int main() {
         interface);
   }
 
+  // Start thread to process packets
+  std::set<std::string> devices;
+  threads.emplace_back([&](std::stop_token token) {
+    while (not token.stop_requested()) {
+
+      // Sleep for a while
+      std::this_thread::sleep_for(1s);
+
+      std::osyncstream{std::cout}
+          << std::format("Packets per second: {}\n", std::size(packets));
+
+      // Process the packets
+      std::scoped_lock lock{packet_mutex};
+      for (auto &packet : packets)
+        devices.insert(packet.source_.mac_);
+
+      // Clear down the packets
+      packets.clear();
+
+      // Print the devices
+      for (auto &device : devices)
+        std::osyncstream{std::cout} << std::format("{}\n", oui::lookup(device));
+    }
+  });
+
   // Capture packets for a while
-  std::this_thread::sleep_for(10s);
+  std::this_thread::sleep_for(60s);
 
   // Stop all the threads
   for (auto &thread : threads)
     thread.request_stop();
-
-  // Prepare the vendor list
-  std::map<std::string, size_t> vendors;
-
-  // Print the packets
-  for (auto &packet : packets) {
-    // Resolve the vendors
-    auto source_vendor = oui::lookup(packet.source_.mac_);
-    auto destination_vendor = oui::lookup(packet.destination_.mac_);
-
-    std::osyncstream{std::cout}
-        << std::format("{:6} {:04x} {} > {} | {} > {}\n", packet.interface_,
-                       packet.type_, source_vendor, destination_vendor,
-                       packet.source_.ip_, packet.destination_.ip_);
-
-    // Add the vendors to the set
-    ++vendors[std::format("{:16} {}", packet.source_.ip_, source_vendor)];
-    ++vendors[std::format("{:16} {}", packet.destination_.ip_,
-                          destination_vendor)];
-  }
-
-  // Print the vendors
-  std::osyncstream{std::cout} << "Vendors:\n";
-  for (auto &[vendor, count] : vendors)
-    std::osyncstream{std::cout} << std::format("{:6} {}\n", count, vendor);
 }

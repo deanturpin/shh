@@ -14,6 +14,7 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+- [ ] oui::lookup should probably return empty string if not found
 - [ ] can packet_t constructors be opened up?
 - [ ] dns lookup for IP addresses
 - [ ] Does libpcap have all the headers structures?
