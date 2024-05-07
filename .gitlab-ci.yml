@@ -11,6 +11,7 @@ pages:
 
     # Store last git commit message
     - git log -1 --oneline | tee --append index.md
+    - echo | tee --append index.md
 
     # Create some network traffic in the background
     - nmap -A turpin.dev &
