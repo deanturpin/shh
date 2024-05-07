@@ -1,5 +1,6 @@
 #include "oui.h"
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <map>
 #include <ranges>
@@ -11,9 +12,14 @@ namespace {
 auto strip(std::string_view mac) {
   auto key = std::string{mac};
   key.erase(std::remove_if(key.begin(), key.end(),
-                           [](char c) { return !std::isxdigit(c); }),
+                           [](char c) { return not std::isxdigit(c); }),
             key.end());
   std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+  assert(not key.contains(" "));
+  assert(not key.contains(":"));
+  assert(not key.contains(":"));
+
   return key;
 }
 
@@ -21,15 +27,18 @@ auto strip(std::string_view mac) {
 auto sanitise(std::string_view str) {
   auto key = std::string{str};
   key.erase(std::remove_if(key.begin(), key.end(),
-                           [](char c) { return !std::isprint(c); }),
+                           [](char c) { return not std::isprint(c); }),
             key.end());
   return key;
 }
 
 // Tidy up a MAC address into just the vendor part
-std::string mac_to_vendor(const std::string_view mac) {
-  auto key = strip(mac);
-  return std::string{key.begin(), key.end()}.substr(0, 6);
+std::string mac_to_vendor(const std::string_view dirty) {
+  auto clean = strip(dirty);
+  auto vendor = clean.substr(0, 6);
+
+  assert(std::size(vendor) == 6);
+  return vendor;
 }
 
 // Remove leading and trailing whitespace
@@ -64,13 +73,13 @@ std::map<std::string, std::string> get_oui() {
   // Initialise the database with come common vendors that are missing from the
   // oui.txt file
   auto oui = std::map<std::string, std::string>{
-      {"f2:ed:07", "Nothing Technology Limited"},
-      {"01:00:5e", "IPv4 multicast"},
-      {"01:80:c2", "IEEE 802.1X"},
-      {"33:33:00", "IPv6 multicast"},
-      {"33:33:ff", "IPv6 multicast"},
-      {"ff:ff:ff", "Broadcast"},
-      {"00:00:00", "Unicast"}};
+      {"f2ed07", "Nothing Technology Limited"},
+      {"01005e", "IPv4 multicast"},
+      {"0180c2", "IEEE 802.1X"},
+      {"333300", "IPv6 multicast"},
+      {"3333ff", "IPv6 multicast"},
+      {"ffffff", "Broadcast"},
+      {"000000", "Unicast"}};
 
   // Parse each line
   for (auto line : str | std::views::split('\n')) {
@@ -87,7 +96,7 @@ std::map<std::string, std::string> get_oui() {
       auto key = s.substr(0, 8);
       auto value = s.substr(pos + 6);
 
-      // Remove leading and trailing spaces
+      // Remove non-hex characters before using the key
       auto vendor = strip(key);
 
       oui[vendor] = value;
