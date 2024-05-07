@@ -4,8 +4,6 @@
 
 Passive command line monitoring of network traffic.
 
-> Why did George Michael get chocolate on his pants? Because he was careless with his Wispa.
-
 See [the repo](https://gitlab.com/deanturpin/wispa).
 
 ## Build and run
