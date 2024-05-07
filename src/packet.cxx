@@ -30,7 +30,7 @@ ethernet_packet_t packet_t::read() {
   if (data == nullptr)
     return {};
 
-  // Structure of the first part of the  packet
+  // Structure of the first part of the packet
   struct ethernet_header_t {
     uint8_t destination_mac_[6];
     uint8_t source_mac_[6];
@@ -43,39 +43,41 @@ ethernet_packet_t packet_t::read() {
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
   // Extract the MAC addresses
-  auto mac_source = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+  auto source_mac = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
                                 eth->source_mac_[0], eth->source_mac_[1],
                                 eth->source_mac_[2], eth->source_mac_[3],
                                 eth->source_mac_[4], eth->source_mac_[5]);
 
-  auto mac_dest =
+  auto destination_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
                   eth->destination_mac_[0], eth->destination_mac_[1],
                   eth->destination_mac_[2], eth->destination_mac_[3],
                   eth->destination_mac_[4], eth->destination_mac_[5]);
 
-  auto ip_source = std::string{};
-  auto ip_dest = std::string{};
-
-  static_assert(sizeof(ip_header_t) == 20);
+  auto source_ip = std::string{};
+  auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
   if (eth->packet_type_ == 0x0008) {
 
+    // Map the IPv4 structure onto these data
     auto ip =
         reinterpret_cast<const ip_header_t *>(data + sizeof(ethernet_header_t));
 
-    ip_source = std::format("{}.{}.{}.{}", ip->source_ip_[0], ip->source_ip_[1],
+    // Extract from IP
+    source_ip = std::format("{}.{}.{}.{}", ip->source_ip_[0], ip->source_ip_[1],
                             ip->source_ip_[2], ip->source_ip_[3]);
 
-    ip_dest = std::format("{}.{}.{}.{}", ip->dest_ip_[0], ip->dest_ip_[1],
-                          ip->dest_ip_[2], ip->dest_ip_[3]);
+    // Extract to IP
+    destination_ip =
+        std::format("{}.{}.{}.{}", ip->dest_ip_[0], ip->dest_ip_[1],
+                    ip->dest_ip_[2], ip->dest_ip_[3]);
   }
 
   return {
       .interface_ = interface_,
-      .source_ = {.mac_ = mac_source, .ip_ = ip_source},
-      .destination_ = {.mac_ = mac_dest, .ip_ = ip_dest},
+      .source_ = {.mac_ = source_mac, .ip_ = source_ip},
+      .destination_ = {.mac_ = destination_mac, .ip_ = destination_ip},
       .type_ = eth->packet_type_,
   };
 }

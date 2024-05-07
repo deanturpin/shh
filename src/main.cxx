@@ -2,8 +2,10 @@
 #include "packet.h"
 #include "types.h"
 #include <cassert>
+#include <chrono>
 #include <format>
 #include <iostream>
+#include <map>
 #include <mutex>
 #include <ranges>
 #include <string>
@@ -14,7 +16,7 @@
 int main() {
   using namespace std::chrono_literals;
 
-  // Shared data structure for stored packets
+  // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
   auto packets = std::vector<ethernet_packet_t>{};
 
@@ -63,22 +65,32 @@ int main() {
   }
 
   // Capture packets for a while
-  std::this_thread::sleep_for(5s);
+  std::this_thread::sleep_for(10s);
 
   // Stop all the threads
   for (auto &thread : threads)
     thread.request_stop();
 
+  // Prepare the vendor list
+  std::map<std::string, size_t> vendors;
+
   // Print the packets
   for (auto &packet : packets) {
-    // Resolve the vendors or just print the MAC address
+    // Resolve the vendors
     auto source_vendor = oui::lookup(packet.source_.mac_);
-    auto dest_vendor = oui::lookup(packet.destination_.mac_);
+    auto destination_vendor = oui::lookup(packet.destination_.mac_);
 
-    std::osyncstream{std::cout} << std::format(
-        "{:6} {:04x} {} > {} | {} > {}\n", packet.interface_, packet.type_,
-        std::empty(source_vendor) ? packet.source_.mac_ : source_vendor,
-        std::empty(dest_vendor) ? packet.destination_.mac_ : dest_vendor,
-        packet.source_.ip_, packet.destination_.ip_);
+    std::osyncstream{std::cout}
+        << std::format("{:6} {:04x} {} > {} | {} > {}\n", packet.interface_,
+                       packet.type_, source_vendor, destination_vendor,
+                       packet.source_.ip_, packet.destination_.ip_);
+
+    // Add the vendors to the set
+    ++vendors[std::format("{:16} {}", packet.source_.ip_, source_vendor)];
   }
+
+  // Print the vendors
+  std::osyncstream{std::cout} << "Vendors:\n";
+  for (auto &[vendor, count] : vendors)
+    std::osyncstream{std::cout} << std::format("{:6} {}\n", count, vendor);
 }

@@ -61,11 +61,18 @@ std::map<std::string, std::string> get_oui() {
   auto str = std::string{std::istreambuf_iterator<char>{in},
                          std::istreambuf_iterator<char>{}};
 
-  // Parse each line
+  // Initialise the database with come common vendors that are missing from the
+  // oui.txt file
   auto oui = std::map<std::string, std::string>{
       {"f2:ed:07", "Nothing Technology Limited"},
-  };
+      {"01:00:5e", "IPv4 multicast"},
+      {"01:80:c2", "IEEE 802.1X"},
+      {"33:33:00", "IPv6 multicast"},
+      {"33:33:ff", "IPv6 multicast"},
+      {"ff:ff:ff", "Broadcast"},
+      {"00:00:00", "Unicast"}};
 
+  // Parse each line
   for (auto line : str | std::views::split('\n')) {
 
     // Look for all the lines with the (hex) string
@@ -105,8 +112,9 @@ std::string lookup(const std::string_view mac) {
   auto it = database.find(vendor);
   auto details = it != database.end() ? it->second : "";
 
-  // Return the cleaned up vendor details if found, or nothing. NOTHING
-  return sanitise(details);
+  // Return the cleaned up vendor details if found
+  // Otherwise just return the MAC address
+  return std::empty(details) ? std::string{mac} : sanitise(details);
 }
 
 // Pretty print the MAC address

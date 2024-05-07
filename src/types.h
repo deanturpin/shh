@@ -4,7 +4,6 @@
 #include <string>
 
 // Shared data structure for devices seen on the network
-// See: dependency inversion principle
 struct ethernet_packet_t {
 
   // The interface the packet was captured on
@@ -16,7 +15,7 @@ struct ethernet_packet_t {
     std::string ip_{};
   } source_{}, destination_{};
 
-  // Type of the packet: TCP, UDP, ICMP
+  // Type of the packet, which indicates the payload structure
   uint16_t type_{};
 };
 
@@ -33,3 +32,5 @@ struct ip_header_t {
   uint8_t source_ip_[4];
   uint8_t dest_ip_[4];
 };
+
+static_assert(sizeof(ip_header_t) == 20);

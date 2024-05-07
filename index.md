@@ -10,7 +10,7 @@ See [the repo](https://gitlab.com/deanturpin/wispa).
 
 ## Build and run
 
-Just clone the repo and run `make`, which invokes all the usual CMake commands and runs the exe.
+Just clone the repo and run `make`, which invokes all the usual CMake commands and executes the binary.
 
 ## Building and running in a Docker container
 
