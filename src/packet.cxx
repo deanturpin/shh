@@ -74,8 +74,18 @@ ethernet_packet_t packet_t::read() {
                     ip->dest_ip_[2], ip->dest_ip_[3]);
   }
 
+  // If it's an RTP packet, extract the payload type
+  auto info = std::string{};
+  if (eth->packet_type_ == 0x0089) {
+    auto rtp = reinterpret_cast<const uint8_t *>(
+        data + sizeof(ethernet_header_t) + 12);
+    auto payload_type = *rtp & 0x7f;
+    info = std::format("RTP payload type: {}", payload_type);
+  }
+
   return {
       .interface_ = interface_,
+      .info = info,
       .source_ = {.mac_ = source_mac, .ip_ = source_ip},
       .destination_ = {.mac_ = destination_mac, .ip_ = destination_ip},
       .type_ = eth->packet_type_,

@@ -9,6 +9,9 @@ struct ethernet_packet_t {
   // The interface the packet was captured on
   std::string interface_{};
 
+  // Some interesting data from the packet
+  std::string info{};
+
   // Source and destination devices
   struct {
     std::string mac_{};

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <ranges>
 
@@ -37,7 +38,13 @@ std::string mac_to_vendor(const std::string_view dirty) {
   auto clean = strip(dirty);
   auto vendor = clean.substr(0, 6);
 
-  assert(std::size(vendor) == 6);
+  if (std::size(vendor) != 6) {
+
+    std::cout << "Invalid MAC address: " << dirty << std::endl;
+    abort();
+  }
+
+  assert(std::size(vendor) < 7);
   return vendor;
 }
 

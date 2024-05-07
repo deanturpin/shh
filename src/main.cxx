@@ -56,7 +56,7 @@ int main() {
   }
 
   // Start thread to process packets
-  std::set<std::string> devices;
+  std::map<std::string, ethernet_packet_t> devices;
   threads.emplace_back([&](std::stop_token token) {
     while (not token.stop_requested()) {
 
@@ -69,19 +69,20 @@ int main() {
       // Process the packets
       std::scoped_lock lock{packet_mutex};
       for (auto &packet : packets)
-        devices.insert(packet.source_.mac_);
+        devices.emplace(packet.source_.mac_, packet);
 
       // Clear down the packets
       packets.clear();
 
       // Print the devices
-      for (auto &device : devices)
-        std::osyncstream{std::cout} << std::format("{}\n", oui::lookup(device));
+      for (auto &[mac, device] : devices)
+        std::osyncstream{std::cout} << std::format(
+            "{:15} {} {}\n", device.source_.ip_, oui::lookup(mac), device.info);
     }
   });
 
   // Capture packets for a while
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(30 * 60s);
 
   // Stop all the threads
   for (auto &thread : threads)
