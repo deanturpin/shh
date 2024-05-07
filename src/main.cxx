@@ -87,6 +87,8 @@ int main() {
 
     // Add the vendors to the set
     ++vendors[std::format("{:16} {}", packet.source_.ip_, source_vendor)];
+    ++vendors[std::format("{:16} {}", packet.destination_.ip_,
+                          destination_vendor)];
   }
 
   // Print the vendors
