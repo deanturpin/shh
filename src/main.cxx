@@ -62,7 +62,8 @@ int main() {
     while (not token.stop_requested()) {
 
       // Sleep for a while
-      std::this_thread::sleep_for(1s);
+      auto interval = 1000ms;
+      std::this_thread::sleep_for(interval);
 
       auto total_bytes = size_t{};
 
@@ -86,7 +87,7 @@ int main() {
 
       std::osyncstream{std::cout}
           << std::format("\n{} packets | {:.3f} Mb/s\n", devices.size(),
-                         total_bytes * 8 / 1'000'000.0);
+                         (total_bytes * 8 / 1'000'000.0) / interval.count());
 
       // Print the devices
       for (auto &[mac, device] : devices)
