@@ -76,7 +76,6 @@ int main() {
 
           // Store MAC addresses
           devices.emplace(packet.source_.mac_, packet);
-          devices.emplace(packet.destination_.mac_, packet);
         }
 
         // Clear down the packets
@@ -98,7 +97,7 @@ int main() {
   });
 
   // Capture packets for a while
-  std::this_thread::sleep_for(10s);
+  std::this_thread::sleep_for(10 * 30s);
 
   // Stop all the threads
   for (auto &thread : threads) {
