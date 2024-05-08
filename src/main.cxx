@@ -85,7 +85,7 @@ int main() {
       // Print the devices
       for (auto &[mac, device] : devices)
         std::osyncstream{std::cout} << std::format(
-            "{:15} {} {}\n", device.source_.ip_, oui::lookup(mac), device.info);
+            "{:15} {:17} {}\n", device.source_.ip_, mac, oui::lookup(mac));
     }
   });
 
