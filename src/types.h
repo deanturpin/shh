@@ -20,6 +20,7 @@ struct ethernet_packet_t {
 
   // Type of the packet, which indicates the payload structure
   uint16_t type_{};
+  size_t length{};
 };
 
 // IPv4 structure

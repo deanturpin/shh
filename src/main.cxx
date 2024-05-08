@@ -64,14 +64,17 @@ int main() {
       // Sleep for a while
       std::this_thread::sleep_for(1s);
 
-      std::osyncstream{std::cout}
-          << std::format("\nPackets per second: {}\n", std::size(packets));
+      auto total_bytes = size_t{};
 
       // Process the packets
       {
         std::scoped_lock lock{packet_mutex};
         for (auto &packet : packets) {
 
+          // Store packet size
+          total_bytes += packet.length;
+
+          // Store MAC addresses
           devices.emplace(packet.source_.mac_, packet);
           devices.emplace(packet.destination_.mac_, packet);
         }
@@ -82,10 +85,15 @@ int main() {
 
       // We can release the lock as soon as we've cleared the packets
 
+      std::osyncstream{std::cout}
+          << std::format("\n{} packets | {:.3f} Mb/s\n", devices.size(),
+                         total_bytes * 8 / 1'000'000.0);
+
       // Print the devices
       for (auto &[mac, device] : devices)
-        std::osyncstream{std::cout} << std::format(
-            "{:15} {:17} {}\n", device.source_.ip_, mac, oui::lookup(mac));
+        std::osyncstream{std::cout}
+            << std::format("{:15} {:17} {:04x} {}\n", device.source_.ip_, mac,
+                           device.type_, oui::lookup(mac));
     }
   });
 
@@ -100,5 +108,5 @@ int main() {
     thread.join();
   }
 
-  std::osyncstream{std::cout} << "\nGoodnight\n";
+  std::osyncstream{std::cout} << "\ngod natt\n";
 }
