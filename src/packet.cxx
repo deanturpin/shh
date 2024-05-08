@@ -1,5 +1,7 @@
 #include "packet.h"
 #include "types.h"
+#include <bit>
+#include <cassert>
 #include <format>
 
 namespace cap {
@@ -24,19 +26,21 @@ packet_t::~packet_t() {
 
 // Read a single packet from the interface
 ethernet_packet_t packet_t::read() {
-  pcap_pkthdr header;
-  const u_char *data = pcap_next(pcap_, &header);
+  const u_char *data;
+  pcap_pkthdr *header;
+  auto success = pcap_next_ex(pcap_, &header, &data);
 
-  if (data == nullptr)
+  if (success != 1)
     return {};
 
   // Structure of the first part of the packet
   struct ethernet_header_t {
-    uint8_t destination_mac_[6];
-    uint8_t source_mac_[6];
-    uint16_t packet_type_;
+    uint8_t destination_mac_[6]{};
+    uint8_t source_mac_[6]{};
+    uint16_t packet_type_{};
   };
 
+  assert(header->len >= sizeof(ethernet_header_t));
   static_assert(sizeof(ethernet_header_t) == 14);
 
   // Map these data into the header structure
@@ -58,7 +62,7 @@ ethernet_packet_t packet_t::read() {
   auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
-  if (eth->packet_type_ == 0x0008) {
+  if (std::byteswap(eth->packet_type_) == 0x0800) {
 
     // Map the IPv4 structure onto these data
     auto ip =
@@ -74,21 +78,13 @@ ethernet_packet_t packet_t::read() {
                     ip->dest_ip_[2], ip->dest_ip_[3]);
   }
 
-  // If it's an RTP packet, extract the payload type
-  auto info = std::string{};
-  if (eth->packet_type_ == 0x0089) {
-    auto rtp = reinterpret_cast<const uint8_t *>(
-        data + sizeof(ethernet_header_t) + 12);
-    auto payload_type = *rtp & 0x7f;
-    info = std::format("RTP payload type: {}", payload_type);
-  }
-
   return {
       .interface_ = interface_,
-      .info = info,
+      .info = std::string{},
       .source_ = {.mac_ = source_mac, .ip_ = source_ip},
       .destination_ = {.mac_ = destination_mac, .ip_ = destination_ip},
-      .type_ = eth->packet_type_,
+      .type_ = std::byteswap(eth->packet_type_),
+      .length = header->len,
   };
 }
 
