@@ -10,7 +10,7 @@ pages:
     - echo '```' | tee --append index.md
 
     # Store last git commit message
-    - echo "Last commit message '$(git log -1 --oneline)' | tee --append index.md
+    - echo "Last commit message '$(git log -1 --oneline)'" | tee --append index.md
     - echo | tee --append index.md
 
     # Create some network traffic in the background
