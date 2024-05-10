@@ -85,15 +85,16 @@ int main() {
 
       // We can release the lock as soon as we've cleared the packets
 
-      std::osyncstream{std::cout}
-          << std::format("\n{} packets | {:.3f} Mb/s\n", devices.size(),
-                         (total_bytes * 8 / 1'000'000.0) / interval.count());
-
       // Print the devices
       for (auto &[mac, device] : devices)
         std::osyncstream{std::cout}
             << std::format("{:15} {:17} {:04x} {}\n", device.source_.ip_, mac,
                            device.type_, oui::lookup(mac));
+
+      std::osyncstream{std::cout}
+          << std::format("\n{} packets @ {:.3f} Mb/s\n\n", devices.size(),
+                         (total_bytes * 8 / 1'000'000.0) / interval.count());
+
     }
   });
 
@@ -108,5 +109,5 @@ int main() {
     thread.join();
   }
 
-  std::osyncstream{std::cout} << "\ngod natt\n";
+  std::osyncstream{std::cout} << "god natt\n";
 }

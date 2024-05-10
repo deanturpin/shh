@@ -15,6 +15,8 @@ This is the bit that doesn't move properly
 ```
 
 - [ ] is_valid mac test
+- [ ] check if any new interfaces have been added
+- [ ] can we snoop bluetooth?
 - [ ] consolidate strip and sanitise
 - [ ] oui::lookup should probably return empty string if not found
 - [ ] can packet_t constructors be opened up?

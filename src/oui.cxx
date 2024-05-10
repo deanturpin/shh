@@ -46,6 +46,140 @@ std::string mac_to_vendor(std::string_view dirty) {
   return vendor;
 }
 
+namespace constd {
+
+// use string_view literals
+using namespace std::string_view_literals;
+
+// Make it easy to replace this with a constexpr function
+// Can be marked deprecated
+constexpr bool is_print(char c) {
+
+  // All printable characters
+  constexpr auto printable_chars =
+      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()"
+      "*+,-./:;<=>?@[\\]^_`{|}~ "sv;
+
+  return printable_chars.contains(c);
+}
+
+static_assert(is_print(' '));
+static_assert(is_print('a'));
+static_assert(is_print('A'));
+static_assert(is_print('!'));
+static_assert(is_print('~'));
+static_assert(not is_print('\n'));
+static_assert(not is_print('\b'));
+static_assert(not is_print('\t'));
+
+// Check for hexadecimals
+constexpr bool isxdigit(char c) {
+
+  // All hexadecimals characters
+  constexpr auto all_hex = "0123456789abcdefABCDEF"sv;
+
+  return all_hex.contains(c);
+}
+
+static_assert(isxdigit('0'));
+static_assert(isxdigit('9'));
+static_assert(isxdigit('a'));
+static_assert(isxdigit('f'));
+static_assert(isxdigit('A'));
+static_assert(isxdigit('F'));
+static_assert(not isxdigit('g'));
+static_assert(not isxdigit('G'));
+static_assert(not isxdigit(' '));
+static_assert(not isxdigit('\n'));
+static_assert(not isxdigit('\b'));
+
+} // namespace constd
+
+// Confirm a MAC is the correct length and uses only the valid characters
+// Note they can be either case, but must be consistent
+constexpr bool is_valid_mac_address(std::string_view mac) {
+
+  // No colon format
+  if (std::size(mac) == 12) {
+    // Only hexadecimals allowed
+    if (std::ranges::all_of(mac, [](char c) { return constd::isxdigit(c); }))
+      return true;
+  }
+
+  // Colon format
+  else if (std::size(mac) == 17) {
+    // Only hexadecimals and colons allowed
+    if (std::ranges::all_of(
+            mac, [](char c) { return constd::isxdigit(c) or c == ':'; }))
+      return true;
+  }
+
+  // Not a valid MAC address
+  return false;
+}
+
+// static fuzzy test
+// fuzzy bear
+
+// // is_valid_ip_address
+
+//   // Split the IP address into parts
+//   auto parts = std::vector<std::string_view>{};
+//   auto start = 0;
+
+//   for (auto i = 0; i < std::size(ip); ++i) {
+//     if (ip[i] == '.') {
+//       parts.push_back(ip.substr(start, i - start));
+//       start = i + 1;
+//     }
+//   }
+
+//   // Add the last part
+//   parts.push_back(ip.substr(start));
+
+//   // Check for four parts
+//   if (std::size(parts) != 4)
+//     return false;
+
+//   // Check each part is a number
+//   for (auto part : parts) {
+//     if (std::ranges::any_of(part, [](char c) { return not std::isdigit(c);
+//     }))
+//       return false;
+//   }
+
+//   // Check each part is in the correct range
+//   for (auto part : parts) {
+//     auto value = std::stoi(std::string{part});
+//     if (value < 0 or value > 255)
+//       return false;
+//   }
+
+//   return true;
+// }
+
+// // Tests
+// static_assert(is_valid_ip_address("192.168.0.1"));
+
+// Colon format
+static_assert(is_valid_mac_address("00:00:00:00:00:00"));
+static_assert(is_valid_mac_address("ff:ff:ff:ff:ff:ff"));
+
+// No colon format
+static_assert(is_valid_mac_address("000000000000"));
+static_assert(is_valid_mac_address("ffffffffffff"));
+
+// Invalid formats
+static_assert(not is_valid_mac_address(""));
+static_assert(not is_valid_mac_address("00:00:00:00:"));
+static_assert(not is_valid_mac_address("00:00:00:00:00:00:0 "));
+static_assert(not is_valid_mac_address("\n\b\n\b\n\b\n\b\n\b\n\b"));
+static_assert(not is_valid_mac_address("00:00:00:00:00:00:00"));
+static_assert(not is_valid_mac_address("00:00:00:00:00"));
+static_assert(not is_valid_mac_address("00:00:00:00:00:00:00:00"));
+static_assert(not is_valid_mac_address("00:\n00:00:00:00:00"));
+static_assert(not is_valid_mac_address("00\n0000000000"));
+
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 

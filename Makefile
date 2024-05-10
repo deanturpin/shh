@@ -15,5 +15,8 @@ clean:
 oui.txt:
 	curl -O https://standards-oui.ieee.org/oui/oui.txt
 
-format:
-	clang-format -i src/*.cxx src/*.h
+docker:
+	while sleep 10; do docker run -it --network host --cap-add=NET_ADMIN -v .:/run deanturpin/gcc make; done
+
+sleep:
+	while sleep 10; do make; done
