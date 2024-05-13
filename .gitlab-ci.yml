@@ -3,7 +3,6 @@ build:
 
   image: docker
   stage: build
-  only: [schedules]
   services: [docker]
   script:
 
