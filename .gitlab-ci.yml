@@ -7,13 +7,13 @@ build:
   script:
 
     # Docker likes to have git
-    - apk add git nmap
+    - apk add git
 
     # Build the image
     - docker buildx build -t deanturpin/wispa .
 
     # Create some network traffic in the background
-    - nmap -A turpin.dev &
+    - docker pull deanturpin/gcc &
     
     # Run the image
     - docker run deanturpin/wispa
