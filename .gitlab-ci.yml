@@ -7,7 +7,7 @@ build:
   script:
 
     # Docker likes to have git
-    - apk add git
+    - apk add git nmap
 
     # Build the image
     - docker buildx build -t deanturpin/wispa .
@@ -21,37 +21,3 @@ build:
     # Push images to Docker registry
     - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
     - docker push deanturpin/wispa
-
-# pages:
-
-#   image: deanturpin/gcc
-#   stage: deploy
-#   artifacts: {paths: [public]}
-#   script:
-
-#     # Start code section
-#     - date | tee --append index.md
-#     - echo '```' | tee --append index.md
-
-#     # Store last git commit message
-#     - echo "Last commit message '$(git log -1 --oneline)'" | tee --append index.md
-#     - echo | tee --append index.md
-
-#     # Create some network traffic in the background
-#     - nmap -A turpin.dev &
-
-#     # Build and run
-#     - make | tee --append index.md
-
-#     # End code section
-#     - echo '```' | tee --append index.md
-
-#     # Report some dev stats
-#     - echo '## sloccount' | tee --append index.md
-#     - echo '```' | tee --append index.md
-#     - make stats | tee --append index.md
-#     - echo '```' | tee --append index.md
-
-#     # Publish
-#     - mkdir public/
-#     - pandoc index.md --standalone -f gfm -t html5 --output public/index.html
