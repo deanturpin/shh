@@ -1,33 +1,53 @@
-pages:
+# Build the image and push to Docker registry
+build:
 
-  image: deanturpin/gcc
-  stage: deploy
-  artifacts: {paths: [public]}
+  image: docker
+  stage: build
+  only: [schedules]
+  services: [docker]
   script:
 
-    # Start code section
-    - date | tee --append index.md
-    - echo '```' | tee --append index.md
+    # Docker likes to have git
+    - apk add git
 
-    # Store last git commit message
-    - echo "Last commit message '$(git log -1 --oneline)'" | tee --append index.md
-    - echo | tee --append index.md
+    # Build a fresh image for latest
+    - docker buildx build -t deanturpin/wispa .
+    - docker run deanturpin/wispa
 
-    # Create some network traffic in the background
-    - nmap -A turpin.dev &
+    # Push images to Docker registry
+    - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
+    - docker push deanturpin/wispa
 
-    # Build and run
-    - make | tee --append index.md
+# pages:
 
-    # End code section
-    - echo '```' | tee --append index.md
+#   image: deanturpin/gcc
+#   stage: deploy
+#   artifacts: {paths: [public]}
+#   script:
 
-    # Report some dev stats
-    - echo '## sloccount' | tee --append index.md
-    - echo '```' | tee --append index.md
-    - make stats | tee --append index.md
-    - echo '```' | tee --append index.md
+#     # Start code section
+#     - date | tee --append index.md
+#     - echo '```' | tee --append index.md
 
-    # Publish
-    - mkdir public/
-    - pandoc index.md --standalone -f gfm -t html5 --output public/index.html
+#     # Store last git commit message
+#     - echo "Last commit message '$(git log -1 --oneline)'" | tee --append index.md
+#     - echo | tee --append index.md
+
+#     # Create some network traffic in the background
+#     - nmap -A turpin.dev &
+
+#     # Build and run
+#     - make | tee --append index.md
+
+#     # End code section
+#     - echo '```' | tee --append index.md
+
+#     # Report some dev stats
+#     - echo '## sloccount' | tee --append index.md
+#     - echo '```' | tee --append index.md
+#     - make stats | tee --append index.md
+#     - echo '```' | tee --append index.md
+
+#     # Publish
+#     - mkdir public/
+#     - pandoc index.md --standalone -f gfm -t html5 --output public/index.html

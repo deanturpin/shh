@@ -118,49 +118,6 @@ constexpr bool is_valid_mac_address(std::string_view mac) {
   return false;
 }
 
-// static fuzzy test
-// fuzzy bear
-
-// // is_valid_ip_address
-
-//   // Split the IP address into parts
-//   auto parts = std::vector<std::string_view>{};
-//   auto start = 0;
-
-//   for (auto i = 0; i < std::size(ip); ++i) {
-//     if (ip[i] == '.') {
-//       parts.push_back(ip.substr(start, i - start));
-//       start = i + 1;
-//     }
-//   }
-
-//   // Add the last part
-//   parts.push_back(ip.substr(start));
-
-//   // Check for four parts
-//   if (std::size(parts) != 4)
-//     return false;
-
-//   // Check each part is a number
-//   for (auto part : parts) {
-//     if (std::ranges::any_of(part, [](char c) { return not std::isdigit(c);
-//     }))
-//       return false;
-//   }
-
-//   // Check each part is in the correct range
-//   for (auto part : parts) {
-//     auto value = std::stoi(std::string{part});
-//     if (value < 0 or value > 255)
-//       return false;
-//   }
-
-//   return true;
-// }
-
-// // Tests
-// static_assert(is_valid_ip_address("192.168.0.1"));
-
 // Colon format
 static_assert(is_valid_mac_address("00:00:00:00:00:00"));
 static_assert(is_valid_mac_address("ff:ff:ff:ff:ff:ff"));

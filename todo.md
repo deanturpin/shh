@@ -14,7 +14,6 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
-- [ ] is_valid mac test
 - [ ] check if any new interfaces have been added
 - [ ] can we snoop bluetooth?
 - [ ] consolidate strip and sanitise

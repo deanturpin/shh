@@ -11,9 +11,15 @@ packet_t::packet_t(std::string_view interface) {
 
   interface_ = interface;
 
+  // Capture arguments
   char errbuf[256];
-  pcap_ =
-      pcap_open_live(std::string{interface}.c_str(), 65535, 1, 1000, errbuf);
+  auto ni = std::string{interface}.c_str();
+  auto snaplen = 65535;
+  auto promiscuous = 1;
+  auto timeout_ms = 1000;
+
+  // Open the device
+  pcap_ = pcap_open_live(ni, snaplen, promiscuous, timeout_ms, errbuf);
 }
 
 // RAII destructor
@@ -26,7 +32,7 @@ packet_t::~packet_t() {
 
 // Read a single packet from the interface
 ethernet_packet_t packet_t::read() {
-  const u_char *data;
+  u_char const *data;
   pcap_pkthdr *header;
   auto success = pcap_next_ex(pcap_, &header, &data);
 
@@ -35,34 +41,36 @@ ethernet_packet_t packet_t::read() {
 
   // Structure of the first part of the packet
   struct ethernet_header_t {
-    uint8_t destination_mac_[6]{};
-    uint8_t source_mac_[6]{};
-    uint16_t packet_type_{};
+    uint8_t destination_mac[6]{};
+    uint8_t source_mac[6]{};
+    uint16_t packet_type{};
   };
 
   assert(header->len >= sizeof(ethernet_header_t));
   static_assert(sizeof(ethernet_header_t) == 14);
 
   // Map these data into the header structure
-  auto eth = reinterpret_cast<const ethernet_header_t *>(data);
+  auto eth =
+      std::span<ethernet_header_t>(
+          reinterpret_cast<ethernet_header_t *>(const_cast<u_char *>(data)), 1)
+          .front();
 
   // Extract the MAC addresses
-  auto source_mac = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                                eth->source_mac_[0], eth->source_mac_[1],
-                                eth->source_mac_[2], eth->source_mac_[3],
-                                eth->source_mac_[4], eth->source_mac_[5]);
-
-  auto destination_mac =
+  auto source_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                  eth->destination_mac_[0], eth->destination_mac_[1],
-                  eth->destination_mac_[2], eth->destination_mac_[3],
-                  eth->destination_mac_[4], eth->destination_mac_[5]);
+                  eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
+                  eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
+
+  auto destination_mac = std::format(
+      "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", eth.destination_mac[0],
+      eth.destination_mac[1], eth.destination_mac[2], eth.destination_mac[3],
+      eth.destination_mac[4], eth.destination_mac[5]);
 
   auto source_ip = std::string{};
   auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
-  if (std::byteswap(eth->packet_type_) == 0x0800) {
+  if (std::byteswap(eth.packet_type) == 0x0800) {
 
     // Map the IPv4 structure onto these data
     auto ip =
@@ -83,7 +91,7 @@ ethernet_packet_t packet_t::read() {
       .info = std::string{},
       .source_ = {.mac_ = source_mac, .ip_ = source_ip},
       .destination_ = {.mac_ = destination_mac, .ip_ = destination_ip},
-      .type_ = std::byteswap(eth->packet_type_),
+      .type_ = std::byteswap(eth.packet_type),
       .length = header->len,
   };
 }
