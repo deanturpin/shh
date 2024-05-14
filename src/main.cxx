@@ -48,7 +48,7 @@ int main() {
 
             // And store it if valid
             std::scoped_lock lock{packet_mutex};
-            if (not std::empty(packet.source_.mac_))
+            if (not std::empty(packet.source.mac))
               packets.push_back(packet);
           }
         },
@@ -76,7 +76,7 @@ int main() {
           total_bytes += packet.length;
 
           // Store MAC addresses
-          devices.emplace(packet.source_.mac_, packet);
+          devices.emplace(packet.source.mac, packet);
         }
 
         // Clear down the packets
@@ -88,7 +88,7 @@ int main() {
       // Print the devices
       for (auto &[mac, device] : devices)
         std::osyncstream{std::cout}
-            << std::format("{:15} {:17} {:04x} {}\n", device.source_.ip_, mac,
+            << std::format("{:15} {:17} {:04x} {}\n", device.source.ip, mac,
                            device.type_, oui::lookup(mac));
 
       std::osyncstream{std::cout}

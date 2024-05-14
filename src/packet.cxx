@@ -89,8 +89,8 @@ ethernet_packet_t packet_t::read() {
   return {
       .interface_ = interface_,
       .info = std::string{},
-      .source_ = {.mac_ = source_mac, .ip_ = source_ip},
-      .destination_ = {.mac_ = destination_mac, .ip_ = destination_ip},
+      .source = {.mac = source_mac, .ip = source_ip},
+      .destination = {.mac = destination_mac, .ip = destination_ip},
       .type_ = std::byteswap(eth.packet_type),
       .length = header->len,
   };

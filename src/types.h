@@ -14,9 +14,9 @@ struct ethernet_packet_t {
 
   // Source and destination devices
   struct {
-    std::string mac_{};
-    std::string ip_{};
-  } source_{}, destination_{};
+    std::string mac{};
+    std::string ip{};
+  } source{}, destination{};
 
   // Type of the packet, which indicates the payload structure
   uint16_t type_{};
