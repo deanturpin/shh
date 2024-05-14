@@ -10,14 +10,12 @@ See [the repo](https://gitlab.com/deanturpin/wispa).
 
 Just clone the repo and run `make`, which invokes all the usual CMake commands and executes the binary.
 
-## Building and running in a Docker container
+## Running the Docker image
 
-Using "latest everything" is not always possible so it can be run in an container. Of course you need to expose your network to the container, which is considered a security risk by some.
+See [Docker](https://hub.docker.com/r/deanturpin/wispa). Note you need to expose your host network to the container.
 
 ```bash
-$ docker run -it --network host -v .:/run deanturpin/gcc make
+docker run --network=host deanturpin/wispa
 ```
-
-All looks nice... and it runs happily in the container... but it doesn't appear to capture the packet type; which makes parsing the packet a little tricky. Some documentation claims you need to use `--cap-add=NET_ADMIN` but that doesn't fix it. _To be continued._
 
 ---
