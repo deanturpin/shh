@@ -13,7 +13,7 @@ build:
     - docker buildx build -t deanturpin/wispa .
 
     # Create some network traffic in the background
-    - docker pull deanturpin/gcc &
+    - ping -c 60 turpin.dev &
     
     # Run the image
     - docker run deanturpin/wispa

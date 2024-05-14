@@ -94,7 +94,6 @@ int main() {
       std::osyncstream{std::cout}
           << std::format("\n{} packets @ {:.3f} Mb/s\n\n", devices.size(),
                          (total_bytes * 8 / 1'000'000.0) / interval.count());
-
     }
   });
 
