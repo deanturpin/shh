@@ -8,4 +8,4 @@ COPY . .
 RUN make
 
 # Run unbuffered
-CMD make run
+CMD stdbuf -o0 -e0 build/wispa

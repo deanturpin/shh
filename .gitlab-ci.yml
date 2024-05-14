@@ -10,8 +10,8 @@ build:
     - apk add git
 
     # Build the image for different hardware
-    - docker buildx build -t deanturpin/wispa .
-    - docker buildx build --platform linux/arm64/v8 -t deanturpin/wispa-arm64 .
+    - docker buildx build --no-cache  -t deanturpin/wispa .
+    - docker buildx build --no-cache --platform linux/arm64/v8 -t deanturpin/wispa-arm64 .
 
     # Push images to Docker registry
     - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
