@@ -9,7 +9,7 @@ namespace cap {
 // Only constructor allowed
 packet_t::packet_t(std::string_view interface) {
 
-  interface_ = interface;
+  interface = interface;
 
   // Capture arguments
   char errbuf[256];
@@ -87,11 +87,11 @@ ethernet_packet_t packet_t::read() {
   }
 
   return {
-      .interface_ = interface_,
+      .interface = interface,
       .info = std::string{},
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
-      .type_ = std::byteswap(eth.packet_type),
+      .type = std::byteswap(eth.packet_type),
       .length = header->len,
   };
 }

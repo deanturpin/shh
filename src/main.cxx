@@ -89,7 +89,7 @@ int main() {
       for (auto &[mac, device] : devices)
         std::osyncstream{std::cout}
             << std::format("{:15} {:17} {:04x} {}\n", device.source.ip, mac,
-                           device.type_, oui::lookup(mac));
+                           device.type, oui::lookup(mac));
 
       std::osyncstream{std::cout}
           << std::format("\n{} packets @ {:.3f} Mb/s\n\n", devices.size(),

@@ -16,7 +16,7 @@ std::set<std::string> interfaces();
 class packet_t {
 
   // Name of the network interface
-  std::string interface_{};
+  std::string interface{};
 
   // Handle to the pcap library
   pcap_t *pcap_ = nullptr;

@@ -7,7 +7,7 @@
 struct ethernet_packet_t {
 
   // The interface the packet was captured on
-  std::string interface_{};
+  std::string interface{};
 
   // Some interesting data from the packet
   std::string info{};
@@ -19,7 +19,7 @@ struct ethernet_packet_t {
   } source{}, destination{};
 
   // Type of the packet, which indicates the payload structure
-  uint16_t type_{};
+  uint16_t type{};
   size_t length{};
 };
 
