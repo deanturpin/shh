@@ -19,7 +19,7 @@ class packet_t {
   std::string interface{};
 
   // Handle to the pcap library
-  pcap_t *pcap_ = nullptr;
+  pcap_t *pcap = nullptr;
 
 public:
   // Start capture on a single interface

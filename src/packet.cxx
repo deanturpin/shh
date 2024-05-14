@@ -19,14 +19,14 @@ packet_t::packet_t(std::string_view interface) {
   auto timeout_ms = 1000;
 
   // Open the device
-  pcap_ = pcap_open_live(ni, snaplen, promiscuous, timeout_ms, errbuf);
+  pcap = pcap_open_live(ni, snaplen, promiscuous, timeout_ms, errbuf);
 }
 
 // RAII destructor
 packet_t::~packet_t() {
-  if (pcap_ != nullptr) {
-    pcap_close(pcap_);
-    pcap_ = nullptr;
+  if (pcap != nullptr) {
+    pcap_close(pcap);
+    pcap = nullptr;
   }
 }
 
@@ -34,7 +34,7 @@ packet_t::~packet_t() {
 ethernet_packet_t packet_t::read() {
   u_char const *data;
   pcap_pkthdr *header;
-  auto success = pcap_next_ex(pcap_, &header, &data);
+  auto success = pcap_next_ex(pcap, &header, &data);
 
   if (success != 1)
     return {};

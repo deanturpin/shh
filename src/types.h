@@ -27,7 +27,7 @@ struct ethernet_packet_t {
 struct ip_header_t {
   uint8_t version_ihl;
   uint8_t dscp_ecn;
-  uint16_t total_length_;
+  uint16_t total_length;
   uint16_t identification;
   uint16_t flags_fragment_offset;
   uint8_t ttl;
