@@ -22,6 +22,9 @@ pages:
   stage: deploy
   artifacts: {paths: [public]}
   script:
+    
+  - apt update
+  - apt install --yes pandoc sloccount make
   
   # Start code section
   - date | tee --append index.md
@@ -41,5 +44,4 @@ pages:
   - echo '```' | tee --append index.md
   
   # Publish
-  - mkdir public/
-  - pandoc index.md --standalone -f gfm -t html5 --output public/index.html
+  - make publish
