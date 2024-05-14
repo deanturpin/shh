@@ -18,5 +18,5 @@ oui.txt:
 	curl -O https://standards-oui.ieee.org/oui/oui.txt
 
 publish:
-  - mkdir -p public/
-  - pandoc index.md --standalone --output public/index.html
+	mkdir -p public/
+	pandoc index.md --standalone --output public/index.html
