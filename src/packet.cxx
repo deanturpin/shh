@@ -77,13 +77,13 @@ ethernet_packet_t packet_t::read() {
         reinterpret_cast<const ip_header_t *>(data + sizeof(ethernet_header_t));
 
     // Extract from IP
-    source_ip = std::format("{}.{}.{}.{}", ip->source_ip_[0], ip->source_ip_[1],
-                            ip->source_ip_[2], ip->source_ip_[3]);
+    source_ip = std::format("{}.{}.{}.{}", ip->source_ip[0], ip->source_ip[1],
+                            ip->source_ip[2], ip->source_ip[3]);
 
     // Extract to IP
     destination_ip =
-        std::format("{}.{}.{}.{}", ip->dest_ip_[0], ip->dest_ip_[1],
-                    ip->dest_ip_[2], ip->dest_ip_[3]);
+        std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
+                    ip->dest_ip[2], ip->dest_ip[3]);
   }
 
   return {
