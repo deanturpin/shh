@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Careless Wispa (lldb)",
+            "type": "cppdbg",
+            "request": "launch",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/wispa",
+            "MIMode": "lldb",
+        }
+    ]
+}

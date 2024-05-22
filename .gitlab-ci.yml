@@ -3,6 +3,7 @@ build:
 
   image: docker
   stage: build
+  only: [main]
   services: [docker]
   script:
 
@@ -22,6 +23,7 @@ pages:
   
   image: ubuntu:devel
   stage: deploy
+  only: [main]
   artifacts: {paths: [public]}
   script:
     

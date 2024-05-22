@@ -5,8 +5,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 if(APPLE)
     # Use the latest homebrew version
-    set(CMAKE_CXX_COMPILER /opt/homebrew/bin/g++-13)
-    set(CMAKE_C_COMPILER /opt/homebrew/bin/gcc-13)
+    set(CMAKE_CXX_COMPILER /opt/homebrew/bin/g++-14)
+    set(CMAKE_C_COMPILER /opt/homebrew/bin/gcc-14)
 elseif(LINUX)
     # Use the compiled version
     set(CMAKE_CXX_COMPILER /usr/local/bin/g++)
