@@ -3,7 +3,6 @@
 #include <bit>
 #include <cassert>
 #include <format>
-#include <span>
 
 namespace cap {
 
