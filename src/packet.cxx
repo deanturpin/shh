@@ -50,10 +50,8 @@ ethernet_packet_t packet_t::read() {
   assert(header->len >= sizeof(ethernet_header_t));
   static_assert(sizeof(ethernet_header_t) == 14);
 
-  // Map these data into the header structure
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
-  // Extract the MAC addresses
   auto source_mac = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
                                 eth->source_mac_[0], eth->source_mac_[1],
                                 eth->source_mac_[2], eth->source_mac_[3],
@@ -84,9 +82,8 @@ ethernet_packet_t packet_t::read() {
                             ip->source_ip[2], ip->source_ip[3]);
 
     // Extract to IP
-    destination_ip =
-        std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
-                    ip->dest_ip[2], ip->dest_ip[3]);
+    destination_ip = std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
+                                 ip->dest_ip[2], ip->dest_ip[3]);
   }
 
   return {
