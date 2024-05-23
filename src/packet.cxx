@@ -110,7 +110,8 @@ std::set<std::string> interfaces() {
   char errbuf[256];
   if (pcap_findalldevs(&alldevs, errbuf) >= 0)
     for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-      network_interfaces.emplace(d->name);
+      if (std::string(d->name) != "any")
+        network_interfaces.emplace(d->name);
 
   return network_interfaces;
 }

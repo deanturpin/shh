@@ -25,12 +25,6 @@ int main() {
 
   // Get all network interfaces
   auto interfaces = cap::interfaces();
-
-  // If there's an "any" interface, just use that
-  constexpr auto catch_all = "any";
-  if (interfaces.contains(catch_all))
-    interfaces = {catch_all};
-
   assert(not std::empty(interfaces));
 
   // Start a thread to capture on each interface
