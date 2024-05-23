@@ -51,26 +51,21 @@ ethernet_packet_t packet_t::read() {
 
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
-  auto source_mac = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                                eth->source_mac_[0], eth->source_mac_[1],
-                                eth->source_mac_[2], eth->source_mac_[3],
-                                eth->source_mac_[4], eth->source_mac_[5]);
+  auto source_mac =
+      std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+                  eth->source_mac[0], eth->source_mac[1], eth->source_mac[2],
+                  eth->source_mac[3], eth->source_mac[4], eth->source_mac[5]);
 
   auto destination_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                  eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
-                  eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
-
-  auto destination_mac = std::format(
-      "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", eth.destination_mac[0],
-      eth.destination_mac[1], eth.destination_mac[2], eth.destination_mac[3],
-      eth.destination_mac[4], eth.destination_mac[5]);
+                  eth->source_mac[0], eth->source_mac[1], eth->source_mac[2],
+                  eth->source_mac[3], eth->source_mac[4], eth->source_mac[5]);
 
   auto source_ip = std::string{};
   auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
-  if (std::byteswap(eth.packet_type) == 0x0800) {
+  if (std::byteswap(eth->packet_type) == 0x0800) {
 
     // Map the IPv4 structure onto these data
     auto ip =
@@ -90,7 +85,7 @@ ethernet_packet_t packet_t::read() {
       .info = std::string{},
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
-      .type = std::byteswap(eth.packet_type),
+      .type = std::byteswap(eth->packet_type),
       .length = header->len,
   };
 }
