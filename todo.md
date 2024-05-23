@@ -14,10 +14,12 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+- [ ] Don't duplicate mac if vendor is unknown (oui::lookup)
+- [ ] Should class assertions go in the header?
+- [ ] packet count is incorrect
 - [ ] check if any new interfaces have been added
 - [ ] can we snoop bluetooth?
 - [ ] consolidate strip and sanitise
-- [ ] oui::lookup should probably return empty string if not found
 - [ ] can packet_t constructors be opened up?
 - [ ] dns lookup for IP addresses
 - [ ] Does libpcap have all the headers structures?
@@ -28,10 +30,6 @@ This is the bit that doesn't move properly
 - [ ] How to static link? Does it mean it runs on Focal?
 - [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
-- [ ] assert macs are non-zero
-- [ ] build and debug in Docker/VSCode
-- [x] Refactor into one thread for reading packets and another for consolidating
-- [x] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
@@ -40,7 +38,6 @@ This is the bit that doesn't move properly
 - [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
 - [ ] Version reporting (git tag, cmake version)
-- [x] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
 - [ ] Animate unknown IP addresses
 - [ ] Search for the OUI file in common locations, otherwise download it
 - [ ] Start typing to filter
@@ -52,6 +49,10 @@ This is the bit that doesn't move properly
 - [ ] Maybe have a static section for reporting and a dynamic section for live data: is this going down the ncurses route?
 - [ ] How to deploy? Package or container?
 - [ ] Why use `stop.store(true);` over plain `stop`?
+- [x] build and debug in Docker/VSCode
+- [x] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
+- [x] Refactor into one thread for reading packets and another for consolidating
+- [x] Review non-blocking logger thread
 - [x] hide the threads and use parallel for_each
 - [x] move capture interfaces into packet class
 - [x] Ethernet header is common data structure

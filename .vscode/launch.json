@@ -2,13 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Careless Wispa (lldb)",
+            "name": "Careless Wispa (macOS)",
             "type": "cppdbg",
             "request": "launch",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/build/wispa",
             "MIMode": "lldb",
+        },
+        {
+            "name": "Careless Wispa (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/wispa",
+            "MIMode": "gdb",
         }
     ]
 }
