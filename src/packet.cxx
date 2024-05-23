@@ -3,6 +3,7 @@
 #include <bit>
 #include <cassert>
 #include <format>
+#include <span>
 
 namespace cap {
 
@@ -50,13 +51,15 @@ ethernet_packet_t packet_t::read() {
   static_assert(sizeof(ethernet_header_t) == 14);
 
   // Map these data into the header structure
-  auto eth =
-      std::span<ethernet_header_t>(
-          reinterpret_cast<ethernet_header_t *>(const_cast<u_char *>(data)), 1)
-          .front();
+  auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
   // Extract the MAC addresses
-  auto source_mac =
+  auto source_mac = std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+                                eth->source_mac_[0], eth->source_mac_[1],
+                                eth->source_mac_[2], eth->source_mac_[3],
+                                eth->source_mac_[4], eth->source_mac_[5]);
+
+  auto destination_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
                   eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
                   eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
