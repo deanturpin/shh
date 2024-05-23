@@ -7,9 +7,9 @@
 namespace cap {
 
 // Only constructor allowed
-packet_t::packet_t(std::string_view interface) {
+packet_t::packet_t(std::string_view in) {
 
-  interface = interface;
+  interface = in;
 
   // Capture arguments
   char errbuf[256];

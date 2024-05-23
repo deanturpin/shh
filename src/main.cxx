@@ -60,6 +60,7 @@ int main() {
       std::this_thread::sleep_for(interval);
 
       auto total_bytes = size_t{};
+      auto total_packets = size_t{};
 
       // Process the packets
       {
@@ -74,6 +75,7 @@ int main() {
         }
 
         // Clear down the packets
+        total_packets = packets.size();
         packets.clear();
       }
 
@@ -81,12 +83,12 @@ int main() {
 
       // Print the devices
       for (auto &[mac, device] : devices)
-        std::osyncstream{std::cout}
-            << std::format("{:15} {:17} {:04x} {}\n", device.source.ip, mac,
-                           device.type, oui::lookup(mac));
+        std::osyncstream{std::cout} << std::format(
+            "{:16} {:15} {:17} {:04x} {}\n", device.interface, device.source.ip,
+            mac, device.type, oui::lookup(mac));
 
       std::osyncstream{std::cout}
-          << std::format("\n{} packets @ {:.3f} Mb/s\n\n", devices.size(),
+          << std::format("\n{} packets @ {:.3f} Mb/s\n\n", total_packets,
                          (total_bytes * 8 / 1'000'000.0) / interval.count());
     }
   });
