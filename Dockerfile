@@ -1,4 +1,4 @@
-FROM deanturpin/dev
+FROM deanturpin/gcc
 
 # Prepare the build area
 WORKDIR /run

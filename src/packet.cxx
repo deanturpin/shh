@@ -8,9 +8,9 @@
 namespace cap {
 
 // Only constructor allowed
-packet_t::packet_t(std::string_view in) {
+packet_t::packet_t(std::string_view interface) {
 
-  interface = in;
+  interface = interface;
 
   // Capture arguments
   char errbuf[256];
@@ -84,8 +84,9 @@ ethernet_packet_t packet_t::read() {
                             ip->source_ip[2], ip->source_ip[3]);
 
     // Extract to IP
-    destination_ip = std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
-                                 ip->dest_ip[2], ip->dest_ip[3]);
+    destination_ip =
+        std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
+                    ip->dest_ip[2], ip->dest_ip[3]);
   }
 
   return {
@@ -117,10 +118,8 @@ std::set<std::string> interfaces() {
   pcap_if_t *alldevs;
   char errbuf[256];
   if (pcap_findalldevs(&alldevs, errbuf) >= 0)
-    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-      if (std::string(d->name) != "any")
-        network_interfaces.emplace(d->name);
-    }
+    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
+      network_interfaces.emplace(d->name);
 
   return network_interfaces;
 }
