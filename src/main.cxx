@@ -93,15 +93,13 @@ int main() {
       // Print the devices
       for (auto &[mac, device] : devices) {
         if (!device.source.ip.empty() || !oui::lookup(mac).empty()) {
-          std::osyncstream{std::cout} << std::format(
-              "{:16} {:15} {:17} {:04x} {}\n", device.interface,
-              device.source.ip, mac, device.type, oui::lookup(mac));
+          std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
+                     device.source.ip, mac, device.type, oui::lookup(mac));
         }
       }
 
-      std::osyncstream{std::cout}
-          << std::format("\n{} packets @ {:.3f} Mb/s\n\n", total_packets,
-                         (total_bytes * 8 / 1'000'000.0) / interval.count());
+      std::println("\n{} packets @ {:.3f} Mb/s\n", total_packets,
+                   (total_bytes * 8 / 1'000'000.0) / interval.count());
     }
   });
 
@@ -113,8 +111,9 @@ int main() {
 
     // It's a jthread but we still want to wait for them to exit, otherwise UB
     thread.request_stop();
-    thread.join();
+    if (thread.joinable())
+      thread.join();
   }
 
-  std::osyncstream{std::cout} << "god natt\n";
+  std::println("god natt");
 }
