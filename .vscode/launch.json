@@ -2,12 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Careless Wispa (lldb)",
+            "name": "shh (lldb)",
             "type": "cppdbg",
             "request": "launch",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/build/wispa",
+            "program": "${workspaceFolder}/build/shh",
             "MIMode": "lldb",
         }
     ]

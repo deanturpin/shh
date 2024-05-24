@@ -3,7 +3,7 @@ all: ieee-oui.txt
 	cmake --build build --parallel
 
 run: all
-	build/wispa
+	build/shh
 
 entr:
 	ls Makefile src/* | entr -cr make --silent run

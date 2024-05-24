@@ -12,7 +12,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_COMPILER g++-14)
 set(CMAKE_C_COMPILER gcc-14)
 
-project(wispa)
+project(shh)
 
 add_executable(${PROJECT_NAME}
     main.cxx
