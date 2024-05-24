@@ -210,7 +210,7 @@ std::string lookup(std::string_view mac) {
 
   // Return the cleaned up vendor details if found
   // Otherwise just return the MAC address
-  return std::empty(details) ? std::string{mac} : sanitise(details);
+  return std::empty(details) ? std::string{} : sanitise(details);
 }
 
 // Pretty print the MAC address

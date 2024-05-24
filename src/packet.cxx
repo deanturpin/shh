@@ -32,6 +32,10 @@ packet_t::~packet_t() {
 
 // Read a single packet from the interface
 ethernet_packet_t packet_t::read() {
+
+  if (pcap == nullptr)
+    return {};
+
   u_char const *data;
   pcap_pkthdr *header;
   auto success = pcap_next_ex(pcap, &header, &data);
