@@ -24,7 +24,7 @@ int main() {
   std::time_t build_time =
       std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   std::cout << "Built with love by a machine on " << std::ctime(&build_time);
-  std::println("https://gitlab.com/deanturpin/ssh @ {}", GIT_HASH);
+  std::println("https://gitlab.com/deanturpin/shh @ {}", GIT_HASH);
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};

@@ -27,6 +27,10 @@ Couldn't get CS register: Input/output error.
 
 ## Todo
 
+- [ ] default make op should also run the binary, need target just to build
+- [ ] Use README.md for Docker instructions
+- [ ] Can repo define which VSCode extensions are required?
+- [ ] make dev container offer latest gcc by default
 - [ ] build in root dir
 - [x] rebrand to "shh"?
 - [ ] Shut down nicely on ctrl-c
