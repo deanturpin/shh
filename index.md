@@ -4,6 +4,8 @@
 
 Passive command line monitoring of network traffic.
 
+See the [Docker file](https://gitlab.com/deanturpin/shh/-/blob/main/Dockerfile).
+
 ## Basic operation
 
 You need to expose your host network to the container to see much, but at least you don't have to run `sudo` as Docker itself is privileged.
