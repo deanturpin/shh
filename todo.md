@@ -2,7 +2,8 @@
 
 ## Tasks
 
-This is the bit that doesn't move properly
+This is the bit that doesn't move properly.
+
 ```cpp
   auto captures = std::vector<packet>{};
   for (auto &interface : network_interfaces)
@@ -14,10 +15,12 @@ This is the bit that doesn't move properly
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+- [ ] fetch the oui data into build dir
+- [ ] Trial md table for results
 - [ ] check if any new interfaces have been added
 - [ ] can we snoop bluetooth?
 - [ ] consolidate strip and sanitise
-- [ ] oui::lookup should probably return empty string if not found
+- [x] oui::lookup should probably return empty string if not found
 - [ ] can packet_t constructors be opened up?
 - [ ] dns lookup for IP addresses
 - [ ] Does libpcap have all the headers structures?
@@ -26,18 +29,18 @@ This is the bit that doesn't move properly
 - [ ] retry building gcc
 - [x] try gcc13 with fmtlib
 - [ ] How to static link? Does it mean it runs on Focal?
-- [ ] install xcode - https://developer.apple.com/xcode/cpp/#c++23
+- [ ] unique pointers for pcap bits
+- [x] install xcode - https://developer.apple.com/xcode/cpp/#c++23
 - [ ] Make utilities `constexpr`
-- [ ] assert macs are non-zero
+- [ ] assert source mac is non-zero
 - [ ] build and debug in Docker/VSCode
 - [x] Refactor into one thread for reading packets and another for consolidating
 - [x] Review non-blocking logger thread
 - [ ] Add rate method (store last access time in class)
 - [ ] Read from a thread should return from the write head back to the previous read head (or 200 packets, whichever is larger) 
 - [ ] Show summary of packet types alongside each interface
-- [ ] Report bits/second on each interface
+- [x] Report bits/second on each interface
 - [ ] use apt oui if on Debian
-- [ ] unique pointers for pcap bits
 - [ ] Dump markdown summary on exit
 - [ ] Version reporting (git tag, cmake version)
 - [x] Why does Docker/Ubuntu container not display packet types? Is it the "any" interface?
