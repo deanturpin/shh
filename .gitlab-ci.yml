@@ -1,4 +1,3 @@
-# Build the image and push to Docker registry
 build:
 
   image: docker
@@ -7,43 +6,10 @@ build:
   services: [docker]
   script:
 
-    # Docker likes to have git
-    - apk add git
-
     # Build the image
+    - apk add git
     - docker buildx build --no-cache  -t deanturpin/wispa .
 
     # Push images to Docker registry
     - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
     - docker push deanturpin/wispa
-
-pages:
-  
-  image: ubuntu:devel
-  stage: deploy
-  only: [main]
-  artifacts: {paths: [public]}
-  script:
-    
-  - apt update
-  - apt install --yes pandoc sloccount make
-  
-  # Start code section
-  - date | tee --append index.md
-  - echo '```' | tee --append index.md
-  
-  # Store last git commit message
-  - echo "Last commit message '$(git log -1 --oneline)'" | tee --append index.md
-  - echo | tee --append index.md
-    
-  # End code section
-  - echo '```' | tee --append index.md
-  
-  # Report some dev stats
-  - echo '## sloccount' | tee --append index.md
-  - echo '```' | tee --append index.md
-  - make stats | tee --append index.md
-  - echo '```' | tee --append index.md
-  
-  # Publish
-  - make publish

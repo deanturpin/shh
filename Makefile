@@ -1,4 +1,4 @@
-all: oui.txt
+all: ieee-oui.txt
 	cmake -B build -S src -G Ninja
 	cmake --build build --parallel
 
@@ -14,8 +14,8 @@ stats:
 clean:
 	$(RM) -r build
 
-oui.txt:
-	curl -O https://standards-oui.ieee.org/oui/oui.txt
+ieee-oui.txt:
+	curl https://standards-oui.ieee.org/oui/oui.txt --output $@
 
 publish:
 	mkdir -p public/
