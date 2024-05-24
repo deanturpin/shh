@@ -9,9 +9,10 @@ execute_process(
 
 set(CMAKE_CXX_FLAGS "-std=c++23 -O1 -Wall -Wextra -Wpedantic -march=native")
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_COMPILER g++-14)
+set(CMAKE_C_COMPILER gcc-14)
 
 project(wispa)
-
 
 add_executable(${PROJECT_NAME}
     main.cxx
