@@ -72,6 +72,7 @@ int main() {
 
           // Store MAC addresses
           devices.emplace(packet.source.mac, packet);
+          devices.emplace(packet.destination.mac, packet);
         }
 
         // Clear down the packets
@@ -79,13 +80,14 @@ int main() {
         packets.clear();
       }
 
-      // We can release the lock as soon as we've cleared the packets
-
       // Print the devices
-      for (auto &[mac, device] : devices)
-        std::osyncstream{std::cout} << std::format(
-            "{:16} {:15} {:17} {:04x} {}\n", device.interface, device.source.ip,
-            mac, device.type, oui::lookup(mac));
+      for (auto &[mac, device] : devices) {
+        if (!device.source.ip.empty() || !oui::lookup(mac).empty()) {
+          std::osyncstream{std::cout} << std::format(
+              "{:16} {:15} {:17} {:04x} {}\n", device.interface,
+              device.source.ip, mac, device.type, oui::lookup(mac));
+        }
+      }
 
       std::osyncstream{std::cout}
           << std::format("\n{} packets @ {:.3f} Mb/s\n\n", total_packets,
