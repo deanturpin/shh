@@ -15,8 +15,21 @@ This is the bit that doesn't move properly.
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+
+## Running in a container on macOS
+
+```bash
+Starting program: /run/build/wispa 
+warning: linux_ptrace_test_ret_to_nx: Cannot PTRACE_GETREGS: Input/output error
+warning: linux_ptrace_test_ret_to_nx: PC 0x900000000 is neither near return address 0x7ffff8d78000 nor is the return instruction 0x555555965971!
+Couldn't get CS register: Input/output error.
+```
+
+## Todo
+
 - [ ] build in root dir
 - [x] rebrand to "shh"?
+- [ ] Shut down nicely on ctrl-c
 - [ ] fetch the oui data into build dir
 - [ ] Trial md table for results
 - [ ] check if any new interfaces have been added
