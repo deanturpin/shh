@@ -8,8 +8,9 @@ build:
 
     # Build the image
     - apk add git
-    - docker buildx build --no-cache  -t deanturpin/wispa .
+    - IMAGE_NAME=deanturpin/ssh
+    - docker buildx build --no-cache  -t $IMAGE_NAME
 
     # Push images to Docker registry
     - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
-    - docker push deanturpin/wispa
+    - docker push $IMAGE_NAME

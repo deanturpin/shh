@@ -96,7 +96,7 @@ int main() {
   });
 
   // Capture packets for a while
-  std::this_thread::sleep_for(30s);
+  std::this_thread::sleep_for(10 * 60s);
 
   // Stop all the threads
   for (auto &thread : threads) {
