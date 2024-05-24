@@ -140,7 +140,18 @@ static_assert(not is_valid_mac_address("00\n0000000000"));
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 
-  auto in = std::ifstream{"oui.txt"};
+  // auto oui_file_locations = std::array<std::string>{
+  //     "/usr/share/arp-scan/ieee-oui.txt",
+  //     "out.txt"};
+
+  // auto preferred_oui = std::find_if(oui_file_locations.begin(),
+  //                               oui_file_locations.end(), [](auto &file) {
+  //                                 return std::ifstream{file}.good();
+  //                               });
+
+  // Open the first file that exists
+
+  auto in = std::ifstream{"ieee-oui.txt"};
 
   // Read whole file into a string
   auto str = std::string{std::istreambuf_iterator<char>{in},
@@ -149,6 +160,7 @@ std::map<std::string, std::string> get_oui() {
   // Initialise database with some vendors that are missing from the oui.txt
   auto oui = std::map<std::string, std::string>{
       {"f2ed07", "Nothing Technology Limited"},
+      {"3e0692", "Nothing Technology Limited"},
       {"01005e", "IPv4 multicast"},
       {"0180c2", "IEEE 802.1X"},
       {"333300", "IPv6 multicast"},
