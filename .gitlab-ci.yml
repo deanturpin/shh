@@ -8,9 +8,8 @@ build:
 
     # Build the image
     - apk add git
-    - IMAGE_NAME=deanturpin/shh
-    - docker buildx build --no-cache -t $IMAGE_NAME .
+    - docker buildx build --no-cache -t deanturpin/shh .
 
     # Push images to Docker registry
     - docker login -u deanturpin -p $DOCKER_ACCESS_TOKEN
-    - docker push $IMAGE_NAME
+    - docker push deanturpin/shh
