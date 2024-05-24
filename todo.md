@@ -15,6 +15,7 @@ This is the bit that doesn't move properly.
       *reinterpret_cast<ethernet_header *>(const_cast<u_char *>(data));
 ```
 
+- [ ] build in root dir
 - [x] rebrand to "shh"?
 - [ ] fetch the oui data into build dir
 - [ ] Trial md table for results
