@@ -4,7 +4,6 @@
 #include <cassert>
 #include <chrono>
 #include <format>
-#include <iostream>
 #include <map>
 #include <mutex>
 #include <print>
@@ -23,7 +22,7 @@ int main() {
 
   std::time_t build_time =
       std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::cout << "Built with love by a machine on " << std::ctime(&build_time);
+  std::println("Built with love by a machine on {}", std::ctime(&build_time));
   std::println("https://gitlab.com/deanturpin/shh @ {}", GIT_HASH);
 
   // Shared data structure for storing captured packets

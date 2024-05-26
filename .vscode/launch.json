@@ -8,7 +8,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/build/shh",
-            "MIMode": "gdb",
+            "MIMode": "lldb",
         }
     ]
 }

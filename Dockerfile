@@ -1,6 +1,5 @@
 FROM deanturpin/dev
 
-# Prepare the build area
 WORKDIR /root/shh
 COPY . .
 

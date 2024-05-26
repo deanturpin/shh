@@ -1,6 +1,6 @@
 # shh
 
-Passive command line monitoring of network traffic.
+Passive command line monitoring of network traffic. See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile).
 
 ## Basic operation
 
