@@ -2,4 +2,5 @@
     "cmake.configureOnEdit": true,
     "cmake.parallelJobs": 0,
     "cmake.generator": "Unix Makefiles",
+    "cmake.sourceDirectory": "/Users/deanturpin/shh",
 }

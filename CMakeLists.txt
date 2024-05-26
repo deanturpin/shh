@@ -15,9 +15,9 @@ set(CMAKE_C_COMPILER gcc-14)
 project(shh)
 
 add_executable(${PROJECT_NAME}
-    main.cxx
-    oui.cxx
-    packet.cxx
+    src/main.cxx
+    src/oui.cxx
+    src/packet.cxx
 )
 
 # Define a preprocessor macro with the git hash

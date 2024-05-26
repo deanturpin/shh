@@ -1,5 +1,5 @@
 all: ieee-oui.txt
-	cmake -B build -S src -G Ninja
+	cmake -B build -S .
 	cmake --build build --parallel
 
 run: all
