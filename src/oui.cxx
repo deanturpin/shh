@@ -3,10 +3,8 @@
 #include <cassert>
 #include <format>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <ranges>
-#include <syncstream>
 
 // Anonymous
 namespace {
@@ -74,11 +72,7 @@ static_assert(not is_print('\t'));
 
 // Check for hexadecimals
 constexpr bool isxdigit(char c) {
-
-  // All hexadecimals characters
-  constexpr auto all_hex = "0123456789abcdefABCDEF"sv;
-
-  return all_hex.contains(c);
+  return "0123456789abcdefABCDEF"sv.contains(c);
 }
 
 static_assert(isxdigit('0'));
@@ -139,17 +133,6 @@ static_assert(not is_valid_mac_address("00\n0000000000"));
 
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
-
-  // auto oui_file_locations = std::array<std::string>{
-  //     "/usr/share/arp-scan/ieee-oui.txt",
-  //     "out.txt"};
-
-  // auto preferred_oui = std::find_if(oui_file_locations.begin(),
-  //                               oui_file_locations.end(), [](auto &file) {
-  //                                 return std::ifstream{file}.good();
-  //                               });
-
-  // Open the first file that exists
 
   auto in = std::ifstream{"ieee-oui.txt"};
 
