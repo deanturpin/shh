@@ -25,6 +25,7 @@ Couldn't get CS register: Input/output error.
 
 ## Todo
 
+- [ ] Build from GitHub
 - [ ] default make op should also run the binary, need target just to build
 - [ ] Use README.md for Docker instructions
 - [ ] Can repo define which VSCode extensions are required?
