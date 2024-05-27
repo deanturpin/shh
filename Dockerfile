@@ -7,4 +7,5 @@ COPY . .
 RUN make
 
 # Run unbuffered
-CMD stdbuf -o0 -e0 build/shh
+CMD figlet deanturpin/shh && \
+    stdbuf -o0 -e0 build/shh
