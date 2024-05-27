@@ -6,4 +6,4 @@ COPY . .
 RUN make
 CMD figlet deanturpin/shh && \
     ip -brief addr && \
-    build/shh
+    stdbuf -o0 -e0 build/shh
