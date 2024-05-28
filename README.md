@@ -1,8 +1,6 @@
 # shh
 
-Passive command line monitoring of network traffic.
-
-See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile).
+Passive command line monitoring of network traffic. See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile).
 
 ## Basic operation
 
@@ -34,9 +32,9 @@ And all the usual `git` commands work, so you can push to my repo (if you're a c
 
 ## Debugging with Visual Studio Code
 
-For an even sweeter development experience you can also connect to the running container with Visual Studio Code.
+For an even sweeter development experience you can connect to the running container with Visual Studio Code.
 
 ## clone and build
 
-You can even build without running in a container... imagine! Simply clone the [repo](https://gitlab.com/deanturpin/shh) and run `make run`, which invokes all the usual CMake commands and executes the binary. But you do need all the latest compilers of course.
+You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run`, which invokes all the usual CMake commands and executes the binary. But you will need all the latest compilers installed of course.
 
