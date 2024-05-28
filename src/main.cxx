@@ -1,12 +1,15 @@
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
+#include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <execution>
 #include <format>
 #include <map>
 #include <mutex>
 #include <print>
+#include <stop_token>
 #include <string>
 #include <thread>
 #include <vector>
@@ -19,10 +22,7 @@ int main() {
 
   using namespace std::chrono_literals;
 
-  std::time_t build_time =
-      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::println("Built with love by a machine on {}", std::ctime(&build_time));
-  std::println("https://gitlab.com/deanturpin/shh @ {}", GIT_HASH);
+  std::println("https://gitlab.com/deanturpin/shh @ {}\n", GIT_HASH);
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
@@ -107,13 +107,12 @@ int main() {
   std::println("Stopping {} threads", threads.size());
 
   // Stop all the threads
-  for (auto &thread : threads) {
+  std::for_each(std::execution::par, threads.begin(), threads.end(),
+                [](std::jthread &thread) {
+                  thread.request_stop();
+                  if (thread.joinable())
+                    thread.join();
+                });
 
-    // It's a jthread but we still want to wait for them to exit, otherwise UB
-    thread.request_stop();
-    if (thread.joinable())
-      thread.join();
-  }
-
-  std::println("god natt");
+  std::println("God natt");
 }
