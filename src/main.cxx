@@ -53,6 +53,8 @@ int main() {
             if (not std::empty(packet.source.mac))
               packets.push_back(packet);
           }
+
+          std::println("Stopped capturing on {}\n", interface);
         },
         interface);
   }
@@ -69,6 +71,7 @@ int main() {
 
       auto total_bytes = size_t{};
       auto total_packets = size_t{};
+      static auto iterations = size_t{};
 
       // Process the packets
       {
@@ -89,20 +92,21 @@ int main() {
       }
 
       // Print the devices
-      for (auto &[mac, device] : devices) {
-        if (!device.source.ip.empty() || !oui::lookup(mac).empty()) {
+      for (auto &[mac, device] : devices)
+        if (!device.source.ip.empty() || !oui::lookup(mac).empty())
           std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
                      device.source.ip, mac, device.type, oui::lookup(mac));
-        }
-      }
 
-      std::println("\n{} packets @ {:.3f} Mb/s\n", total_packets,
-                   (total_bytes * 8 / 1'000'000.0) / interval.count());
+      std::println("\n{} packets @ {:.3f} Mb/s ({})\n", total_packets,
+                   (total_bytes * 8 / 1'000'000.0) / interval.count(),
+                   iterations);
+
+      ++iterations;
     }
   });
 
   // Capture packets for a while
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(10s);
 
   std::println("Stopping {} threads", threads.size());
 
