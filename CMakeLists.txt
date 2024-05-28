@@ -25,7 +25,18 @@ add_executable(${PROJECT_NAME}
     src/packet.cxx
 )
 
+find_package(TBB REQUIRED)
+
+# Add TBB include directories
+target_include_directories(${PROJECT_NAME} PRIVATE ${TBB_INCLUDE_DIRS})
+
+# Link TBB libraries
+target_link_libraries(${PROJECT_NAME} ${TBB_LIBRARIES})
+
 # Define a preprocessor macro with the git hash
 target_compile_definitions(${PROJECT_NAME} PRIVATE GIT_HASH="${GIT_HASH}")
 
-target_link_libraries(${PROJECT_NAME} pcap)
+target_link_libraries(${PROJECT_NAME}
+    pcap
+    TBB::tbb
+)
