@@ -59,54 +59,58 @@ int main() {
         interface);
   }
 
+  // Duration of logging, application will exit after this time
+  auto logging_period = 60s;
+
   // Start thread to process packets
-  threads.emplace_back([&packets, &packet_mutex](std::stop_token token) {
-    std::map<std::string, ethernet_packet_t> devices;
+  threads.emplace_back(
+      [&packets, &packet_mutex, &logging_period](std::stop_token token) {
+        std::map<std::string, ethernet_packet_t> devices;
 
-    while (not token.stop_requested()) {
+        while (not token.stop_requested()) {
 
-      // Sleep for a while
-      auto interval = 1000ms;
-      std::this_thread::sleep_for(interval);
+          // Sleep for a while
+          auto interval = 1000ms;
+          std::this_thread::sleep_for(interval);
 
-      auto total_bytes = size_t{};
-      auto total_packets = size_t{};
-      static auto iterations = size_t{};
+          auto total_bytes = size_t{};
+          auto total_packets = size_t{};
+          static auto iterations = size_t{};
 
-      // Process the packets
-      {
-        std::scoped_lock lock{packet_mutex};
-        for (auto &packet : packets) {
+          // Process the packets
+          {
+            std::scoped_lock lock{packet_mutex};
+            for (auto &packet : packets) {
 
-          // Store packet size
-          total_bytes += packet.length;
+              // Store packet size
+              total_bytes += packet.length;
 
-          // Store MAC addresses
-          devices.emplace(packet.source.mac, packet);
-          devices.emplace(packet.destination.mac, packet);
+              // Store MAC addresses
+              devices.emplace(packet.source.mac, packet);
+              devices.emplace(packet.destination.mac, packet);
+            }
+
+            // Clear down the packets
+            total_packets = packets.size();
+            packets.clear();
+          }
+
+          // Print the devices
+          for (auto &[mac, device] : devices)
+            if (!device.source.ip.empty() || !oui::lookup(mac).empty())
+              std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
+                         device.source.ip, mac, device.type, oui::lookup(mac));
+
+          std::println("\n{} packets @ {:.3f} Mb/s - {}/{}\n", total_packets,
+                       (total_bytes * 8 / 1'000'000.0) / interval.count(),
+                       iterations, logging_period.count());
+
+          ++iterations;
         }
-
-        // Clear down the packets
-        total_packets = packets.size();
-        packets.clear();
-      }
-
-      // Print the devices
-      for (auto &[mac, device] : devices)
-        if (!device.source.ip.empty() || !oui::lookup(mac).empty())
-          std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
-                     device.source.ip, mac, device.type, oui::lookup(mac));
-
-      std::println("\n{} packets @ {:.3f} Mb/s ({})\n", total_packets,
-                   (total_bytes * 8 / 1'000'000.0) / interval.count(),
-                   iterations);
-
-      ++iterations;
-    }
-  });
+      });
 
   // Capture packets for a while
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(logging_period);
 
   std::println("Stopping {} threads", threads.size());
 
