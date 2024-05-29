@@ -30,7 +30,7 @@ int main() {
   std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
 
   // Thread pool
-  auto threads = std::vector<std::jthread>{};
+  auto threads = std::vector<std::thread>{};
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
@@ -40,29 +40,26 @@ int main() {
   auto interfaces = cap::interfaces();
   assert(not std::empty(interfaces));
 
-  // Start a thread to capture on each interface
-  for (auto interface : interfaces) {
-    threads.emplace_back(
-        [&](std::stop_token token, std::string interface) {
-          // Create capture object
-          auto capture = cap::packet_t{interface};
+  std::atomic_bool running = true;
 
-          // Capture until stop is requested
-          while (not token.stop_requested()) {
+  // Start a thread for each interface
+  for (auto interface : interfaces)
+    threads.emplace_back([&] {
+      // Create capture object
+      auto capture = cap::packet_t{interface};
 
-            // Read a packet
-            auto packet = capture.read();
+      // Capture until stop is requested
+      while (running) {
 
-            // And store it if valid
-            std::scoped_lock lock{packet_mutex};
-            if (not std::empty(packet.source.mac))
-              packets.push_back(packet);
-          }
+        // Read a packet
+        auto packet = capture.read();
 
-          std::println("Stopped capturing on {}", interface);
-        },
-        interface);
-  }
+        // And store it if valid
+        std::scoped_lock lock{packet_mutex};
+        if (not std::empty(packet.source.mac))
+          packets.push_back(packet);
+      }
+    });
 
   // Duration of logging, application will exit after this time
   constexpr auto logging_cycles = size_t{60};
@@ -110,6 +107,10 @@ int main() {
   std::println("Stopping {} threads", threads.size());
 
   // Ask all the threads to finish what they're doing
+  running = false;
+
+  // Join all the threads
   for (auto &thread : threads)
-    thread.request_stop();
+    if (thread.joinable())
+      thread.join();
 }
