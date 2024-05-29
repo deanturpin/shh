@@ -22,6 +22,9 @@
 
 int main() {
 
+  // Report when all the threads have gone out of scope and been destroyed
+  std::atexit([] { std::println("God natt"); });
+
   using namespace std::chrono_literals;
 
   std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
