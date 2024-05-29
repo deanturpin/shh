@@ -1,3 +1,5 @@
+MAKEFLAGS += --silent
+
 all: ieee-oui.txt
 	cmake -B build -S .
 	cmake --build build --parallel
