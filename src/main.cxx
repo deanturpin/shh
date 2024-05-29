@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <cstdlib>
 #include <format>
 #include <map>
 #include <mutex>
@@ -14,8 +15,9 @@
 #include <thread>
 #include <vector>
 
+// The git hash is compiled into the binary
 #ifndef GIT_HASH
-#define GIT_HASH "unknown"
+#define GIT_HASH ""
 #endif
 
 int main() {
