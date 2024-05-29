@@ -29,12 +29,12 @@ int main() {
 
   std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
 
+  // Thread pool
+  auto threads = std::vector<std::jthread>{};
+
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
   auto packets = std::vector<ethernet_packet_t>{};
-
-  // Thread pool
-  auto threads = std::vector<std::jthread>{};
 
   // Get all network interfaces
   auto interfaces = cap::interfaces();
@@ -103,22 +103,13 @@ int main() {
                    device.source.ip, mac, device.type, oui::lookup(mac));
 
     std::println("\n{} packets @ {:.3f} Mb/s - {}/{}\n", total_packets,
-                 (total_bytes * 8 / 1'000'000.0) / interval.count(), i,
+                 (total_bytes * 8 / 1'000'000.0) / interval.count(), i + 1,
                  logging_cycles);
   }
 
-  // zip interfaces and threads
-
   std::println("Stopping {} threads", threads.size());
 
-  // Stop all the threads
+  // Ask all the threads to finish what they're doing
   for (auto &thread : threads)
     thread.request_stop();
-
-  // And wait for them to finish
-  for (auto &thread : threads)
-    if (thread.joinable())
-      thread.join();
-
-  std::println("God natt");
 }
