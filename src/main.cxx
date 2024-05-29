@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
-#include <execution>
 #include <format>
 #include <map>
 #include <mutex>
 #include <print>
+#include <ranges>
 #include <stop_token>
 #include <string>
 #include <thread>
@@ -22,7 +22,7 @@ int main() {
 
   using namespace std::chrono_literals;
 
-  std::println("https://gitlab.com/deanturpin/shh @ {}\n", GIT_HASH);
+  std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
