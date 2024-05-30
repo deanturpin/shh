@@ -51,7 +51,7 @@ int main() {
 
     // Capture packets until told to stop
     while (running) {
-      auto packet = capture.read();
+      ethernet_packet_t packet = capture.read();
 
       // If it's not valid, catch your breath and skip it
       if (packet.source.mac.empty()) {
