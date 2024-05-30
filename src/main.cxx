@@ -1,18 +1,16 @@
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
-#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <format>
+#include <future>
 #include <map>
 #include <mutex>
 #include <print>
 #include <ranges>
-#include <stop_token>
 #include <string>
-#include <thread>
 #include <vector>
 
 // The git hash is compiled into the binary
@@ -22,15 +20,11 @@
 
 int main() {
 
-  // Report when all the threads have gone out of scope and been destroyed
-  std::atexit([] { std::println("God natt"); });
-
   using namespace std::chrono_literals;
 
-  std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
+  std::atexit([] { std::println("God natt"); });
 
-  // Thread pool
-  auto threads = std::vector<std::thread>{};
+  std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
@@ -40,31 +34,49 @@ int main() {
   auto interfaces = cap::interfaces();
   assert(not std::empty(interfaces));
 
+  // Hit the ground running
   std::atomic_bool running = true;
 
-  // Start a thread for each interface
-  for (auto interface : interfaces)
-    threads.emplace_back([&] {
-      // Create capture object
-      auto capture = cap::packet_t{interface};
+  // Container for the promises
+  // These are counts of packets captured on each interface
+  std::vector<std::future<size_t>> counts;
 
-      // Capture until stop is requested
-      while (running) {
+  // The capture routine
+  auto func = [&](auto name) {
+    // Return the number of packets captured
+    auto total_packets = 0uz;
 
-        // Read a packet
-        auto packet = capture.read();
+    // Create capture object
+    auto capture = cap::packet_t{name};
 
-        // And store it if valid
-        std::scoped_lock lock{packet_mutex};
-        if (not std::empty(packet.source.mac))
-          packets.push_back(packet);
+    // Capture packets until told to stop
+    while (running) {
+      auto packet = capture.read();
+
+      // If it's not valid, catch your breath and skip it
+      if (packet.source.mac.empty()) {
+        std::this_thread::sleep_for(1ms);
+        continue;
       }
-    });
+
+      ++total_packets;
+
+      // Otherwise store the packet
+      std::scoped_lock lock{packet_mutex};
+      packets.push_back(packet);
+    }
+
+    return total_packets;
+  };
+
+  // Start all the threads
+  for (auto name : interfaces)
+    counts.emplace_back(std::async(std::launch::async, func, name));
 
   // Duration of logging, application will exit after this time
-  constexpr auto logging_cycles = size_t{60};
+  constexpr auto logging_cycles = 60uz;
 
-  for (auto i : std::views::iota(size_t{}, logging_cycles)) {
+  for (auto i : std::views::iota(0uz, logging_cycles)) {
 
     // Sleep for a while
     auto interval = 1000ms;
@@ -72,8 +84,8 @@ int main() {
 
     static std::map<std::string, ethernet_packet_t> devices;
 
-    auto total_bytes = size_t{};
-    auto total_packets = size_t{};
+    auto total_bytes = 0uz;
+    auto total_packets = 0uz;
 
     // Process the packets
     {
@@ -104,13 +116,15 @@ int main() {
                  logging_cycles);
   }
 
-  std::println("Stopping {} threads", threads.size());
+  std::println("Stopping {} threads", interfaces.size());
 
   // Ask all the threads to finish what they're doing
   running = false;
 
-  // Join all the threads
-  for (auto &thread : threads)
-    if (thread.joinable())
-      thread.join();
+  // Wrap names and return values for convenience
+  auto zipped = std::views::zip(interfaces, counts);
+
+  // Wait for all the threads to finish
+  for (const auto &[name, count] : zipped)
+    std::println("{:4} {:16}", count.get(), name);
 }
