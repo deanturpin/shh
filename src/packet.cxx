@@ -36,11 +36,10 @@ ethernet_packet_t packet_t::read() {
   if (pcap == nullptr)
     return {};
 
-  u_char const *data;
-  pcap_pkthdr *header;
-  auto success = pcap_next_ex(pcap, &header, &data);
+  pcap_pkthdr header;
+  const u_char *data = pcap_next(pcap, &header);
 
-  if (success != 1)
+  if (data == nullptr)
     return {};
 
   // Structure of the first part of the packet
@@ -50,7 +49,7 @@ ethernet_packet_t packet_t::read() {
     uint16_t packet_type{};
   };
 
-  assert(header->len >= sizeof(ethernet_header_t));
+  assert(header.len >= sizeof(ethernet_header_t));
   static_assert(sizeof(ethernet_header_t) == 14);
 
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
@@ -90,7 +89,7 @@ ethernet_packet_t packet_t::read() {
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
       .type = std::byteswap(eth->packet_type),
-      .length = header->len,
+      .length = header.len,
   };
 }
 
@@ -113,9 +112,15 @@ std::set<std::string> interfaces() {
   pcap_if_t *alldevs;
   char errbuf[256];
   if (pcap_findalldevs(&alldevs, errbuf) >= 0)
-    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next)
-      if (std::string(d->name) != "any")
-        network_interfaces.emplace(d->name);
+
+    // Get all the good devices
+    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
+      auto name = std::string{d->name};
+      if (name == "any" or name.contains("docker") or name == "lo")
+        continue;
+
+      network_interfaces.emplace(d->name);
+    }
 
   return network_interfaces;
 }
