@@ -1,16 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 
-# Retrieve the git hash
 execute_process(
     COMMAND git rev-parse --short HEAD
     OUTPUT_VARIABLE GIT_HASH
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-
-# Warn if the compiler does not elide the copy from a local variable to the
-# return value of a function in a context where it is allowed by
-# [class.copy.elision]. This elision is commonly known as the Named Return
-# Value Optimization."
 
 set(CMAKE_CXX_FLAGS "-std=c++23 -O1 -Wall -Wextra -Wpedantic -march=native -Wnrvo")
 set(CMAKE_BUILD_TYPE Debug)

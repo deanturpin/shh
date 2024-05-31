@@ -42,3 +42,12 @@ For an even sweeter development experience you can connect to the running contai
 
 You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run`, which invokes all the usual CMake commands and executes the binary. But you will need all the latest compilers installed of course.
 
+## Design
+
+The main thread starts a pcap logging thread for each interface.
+
+Something that drove me mad for a while was not setting the pcap reads to non-blocking; whilst it worked fine on my macOS laptop, on Linux the threads would occasionally block and leave the main thread hanging. However, it did lead me to reimplement it using plain old `std::thread`, `std::jthread` with built-it stop token, `std::for_each` with `std::execution::par` and finally `std::async` with `std::launch::async`; which I think is quite nice to read: waiting for the return value from the thread is a natural way to synchronise with all the stopping threads.
+
+```bash
+pcap_setnonblock(pcap, 1, errbuf);
+```
