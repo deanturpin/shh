@@ -1,25 +1,31 @@
 #include "packet.h"
 #include "types.h"
+#include <algorithm>
+#include <array>
 #include <bit>
 #include <cassert>
 #include <format>
+#include <ranges>
 
 namespace cap {
 
 // Only constructor allowed
-packet_t::packet_t(std::string_view in) {
+packet_t::packet_t(std::string name) {
 
-  interface = in;
+  interface = name;
 
   // Capture arguments
   char errbuf[256];
-  auto ni = std::string{interface}.c_str();
   auto snaplen = 65535;
   auto promiscuous = 1;
-  auto timeout_ms = 1000;
+  auto timeout_ms = 10;
 
   // Open the device
-  pcap = pcap_open_live(ni, snaplen, promiscuous, timeout_ms, errbuf);
+  pcap = pcap_open_live(name.c_str(), snaplen, promiscuous, timeout_ms, errbuf);
+
+  // Set non-blocking mode
+  if (pcap != nullptr)
+    pcap_setnonblock(pcap, 1, errbuf);
 }
 
 // RAII destructor
