@@ -15,7 +15,7 @@ docker run -it --rm --network=host deanturpin/shh
 `shh` is passive, but you might like to generate some traffic on your network.
 
 ```bash
-nmap -A 192.168.1.0/24
+nmap -A 192.168.0.0/24
 ```
 
 ## Recompiling in-place
@@ -38,6 +38,11 @@ git diff > /tmp/diff.patch
 
 For an even sweeter development experience you can connect to the running container with Visual Studio Code.
 
+Run executing `bash` and then connect your IDE to the container. Open `/root/shh` and install CMake Tools and C++ to build and debug.
+
+```bash
+docker run -it --rm --network=host deanturpin/shh bash
+```
 ## clone and build
 
 You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run`, which invokes all the usual CMake commands and executes the binary. But you will need all the latest compilers installed of course.
@@ -48,6 +53,6 @@ The main thread starts a pcap logging thread for each interface.
 
 Something that drove me mad for a while was not setting the pcap reads to non-blocking; whilst it worked fine on my macOS laptop, on Linux the threads would occasionally block and leave the main thread hanging. However, it did lead me to reimplement it using plain old `std::thread`, `std::jthread` with built-it stop token, `std::for_each` with `std::execution::par` and finally `std::async` with `std::launch::async`; which I think is quite nice to read: waiting for the return value from the thread is a natural way to synchronise with all the stopping threads.
 
-```bash
+```cpp
 pcap_setnonblock(pcap, 1, errbuf);
 ```
