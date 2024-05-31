@@ -51,9 +51,11 @@ int main() {
 
     // Capture packets until told to stop
     while (running) {
+
+      // Read one packet
       ethernet_packet_t packet = capture.read();
 
-      // If it's not valid, yield and skip it
+      // If it's invalid, yield and skip it
       if (packet.source.mac.empty()) {
         std::this_thread::sleep_for(1ms);
         continue;
