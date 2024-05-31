@@ -63,7 +63,7 @@ int main() {
 
       // Otherwise store the packet
       std::scoped_lock lock{packet_mutex};
-      packets.push_back(packet);
+      packets.emplace_back(packet);
     }
 
     return total_packets;
@@ -78,32 +78,29 @@ int main() {
 
   for (auto i : std::views::iota(0uz, logging_cycles)) {
 
-    // Sleep for a while
-    auto interval = 1000ms;
+    constexpr auto interval = 1000ms;
     std::this_thread::sleep_for(interval);
 
+    // Map of devices
     static std::map<std::string, ethernet_packet_t> devices;
 
     auto total_bytes = 0uz;
-    auto total_packets = 0uz;
 
     // Process the packets
-    {
-      std::scoped_lock lock{packet_mutex};
-      for (auto &packet : packets) {
+    std::scoped_lock lock{packet_mutex};
+    for (auto packet : packets) {
 
-        // Store packet size
-        total_bytes += packet.length;
+      // Store packet size
+      total_bytes += packet.length;
 
-        // Store MAC addresses
-        devices.emplace(packet.source.mac, packet);
-        devices.emplace(packet.destination.mac, packet);
-      }
-
-      // Clear down the packets
-      total_packets = packets.size();
-      packets.clear();
+      // Store MAC addresses
+      devices[packet.source.mac] = packet;
+      devices[packet.destination.mac] = packet;
     }
+
+    // Clear down the packets
+    auto total_packets = packets.size();
+    packets.clear();
 
     // Print the devices
     for (auto &[mac, device] : devices)
@@ -111,6 +108,7 @@ int main() {
         std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
                    device.source.ip, mac, device.type, oui::lookup(mac));
 
+    // Print summary
     std::println("\n{} packets @ {:.3f} Mb/s - {}/{}\n", total_packets,
                  (total_bytes * 8 / 1'000'000.0) / interval.count(), i + 1,
                  logging_cycles);
