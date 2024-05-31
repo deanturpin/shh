@@ -91,7 +91,6 @@ ethernet_packet_t packet_t::read() {
 
   return {
       .interface = interface,
-      .info = std::string{},
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
       .type = std::byteswap(eth->packet_type),
@@ -99,36 +98,30 @@ ethernet_packet_t packet_t::read() {
   };
 }
 
-// Make assertions about the class
-static_assert(not std::is_default_constructible_v<packet_t>);
-static_assert(not std::is_copy_constructible_v<packet_t>);
-static_assert(not std::is_copy_assignable_v<packet_t>);
-static_assert(not std::is_move_constructible_v<packet_t>);
-static_assert(not std::is_move_assignable_v<packet_t>);
-static_assert(std::is_destructible_v<packet_t>);
-static_assert(std::is_constructible_v<packet_t, std::string_view>);
-static_assert(not std::has_virtual_destructor_v<packet_t>);
-
 // List all network interfaces
-std::set<std::string> interfaces() {
-
-  std::set<std::string> network_interfaces{};
+std::vector<std::string> interfaces() {
 
   // Find all network interfaces
-  pcap_if_t *alldevs;
+  pcap_if_t *all_devices;
   char errbuf[256];
-  if (pcap_findalldevs(&alldevs, errbuf) >= 0)
+  if (pcap_findalldevs(&all_devices, errbuf) < 0)
+    return {};
 
-    // Get all the good devices
-    for (pcap_if_t *d = alldevs; d != nullptr; d = d->next) {
-      auto name = std::string{d->name};
-      if (name == "any" or name.contains("docker") or name == "lo")
-        continue;
+  // Extract all the good ones
+  auto names = std::vector<std::string>{};
+  for (auto dev = all_devices; dev != nullptr; dev = dev->next) {
 
-      network_interfaces.emplace(d->name);
-    }
+    // Exclude list
+    auto name = std::string{dev->name};
+    constexpr auto excludes = std::array{"any"};
 
-  return network_interfaces;
+    // Skip the excluded interfaces
+    if (not std::ranges::any_of(
+            excludes, [name](auto excluded) { return name == excluded; }))
+      names.emplace_back(name);
+  }
+
+  return names;
 }
 
 } // namespace cap

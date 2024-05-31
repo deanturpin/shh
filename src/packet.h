@@ -3,14 +3,13 @@
 #include "packet.h"
 #include "types.h"
 #include <pcap.h>
-#include <set>
 #include <string>
 #include <vector>
 
 namespace cap {
 
 // List all network interfaces
-std::set<std::string> interfaces();
+std::vector<std::string> interfaces();
 
 // RAII wrapper for a capture interface
 class packet_t {
@@ -23,7 +22,7 @@ class packet_t {
 
 public:
   // Start capture on a single interface
-  explicit packet_t(std::string_view);
+  explicit packet_t(std::string);
 
   // Only explicit constructor allowed
   packet_t() noexcept = delete;
@@ -38,5 +37,15 @@ public:
   // RAII destructor
   ~packet_t();
 };
+
+// Make assertions about the class
+static_assert(not std::is_default_constructible_v<packet_t>);
+static_assert(not std::is_copy_constructible_v<packet_t>);
+static_assert(not std::is_copy_assignable_v<packet_t>);
+static_assert(not std::is_move_constructible_v<packet_t>);
+static_assert(not std::is_move_assignable_v<packet_t>);
+static_assert(std::is_destructible_v<packet_t>);
+static_assert(std::is_constructible_v<packet_t, std::string>);
+static_assert(not std::has_virtual_destructor_v<packet_t>);
 
 } // namespace cap
