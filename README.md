@@ -49,7 +49,7 @@ You could even build without running in a container... imagine! Simply clone the
 
 ## Design
 
-The main thread starts a pcap logging thread for each interface; each thread reads packets from a single interface and pushes them to a shared container. Peridoically the main thread processes and empties the shared resources and prints a summary. The main thread runs for a fixed duration and then signals all the threads to stop before joining them to ensure no resources are leaked.
+The main thread starts a pcap logging thread for each interface; each thread then reads packets from a single interface and pushes captured packets to a shared container. Peridoically the main thread processes and empties the shared resource and prints a summary of devices encountered: basically the MAC address and associated IP/flags. The main thread runs for a fixed duration and then signals all the threads to stop before joining them to ensure no resources are leaked.
 
 Something that drove me mad for a while was not setting the pcap reads to non-blocking; whilst it worked fine on my macOS laptop, on Linux the threads would occasionally block and leave the main thread hanging. However, it did lead me to reimplement it using plain old `std::thread`, `std::jthread` with built-it stop token, `std::for_each` with `std::execution::par` and finally `std::async` with `std::launch::async`; which I think is quite nice to read: waiting for the return value from the thread is a natural way to synchronise with all the stopping threads.
 
