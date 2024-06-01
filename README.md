@@ -4,7 +4,7 @@ See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile) and
 
 ## Basic operation
 
-You need to expose your host network to the container to see much, but at least you don't have to run `sudo` as Docker itself is privileged.
+You have to expose your host network to the container to see what's going on, but at least you don't have to run `sudo` as Docker itself is privileged.
 
 ```bash
 docker run -it --rm --network=host deanturpin/shh
