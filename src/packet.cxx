@@ -55,8 +55,8 @@ ethernet_packet_t packet_t::read() {
     uint16_t packet_type{};
   };
 
-  assert(header.len >= sizeof(ethernet_header_t));
   static_assert(sizeof(ethernet_header_t) == 14);
+  assert(header.len >= sizeof(ethernet_header_t));
 
   auto eth = reinterpret_cast<const ethernet_header_t *>(data);
 
@@ -101,14 +101,15 @@ ethernet_packet_t packet_t::read() {
 // List all network interfaces
 std::vector<std::string> interfaces() {
 
+  auto names = std::vector<std::string>{};
+
   // Find all network interfaces
   pcap_if_t *all_devices;
   char errbuf[256];
   if (pcap_findalldevs(&all_devices, errbuf) < 0)
-    return {};
+    return names;
 
   // Extract all the good ones
-  auto names = std::vector<std::string>{};
   for (auto dev = all_devices; dev != nullptr; dev = dev->next) {
 
     // Exclude list
