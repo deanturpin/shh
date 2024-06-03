@@ -71,7 +71,9 @@ int main() {
     return total_packets;
   };
 
-  // Start all the threads
+  // Start a capture thread for each interface
+  std::println("Starting {} threads", interfaces.size());
+
   for (auto name : interfaces)
     counts.emplace_back(std::async(std::launch::async, func, name));
 
@@ -107,7 +109,7 @@ int main() {
     // Print the devices
     for (auto &[mac, device] : devices)
       if (!device.source.ip.empty() || !oui::lookup(mac).empty())
-        std::print("{:16} {:15} {:17} {:04x} {}\n", device.interface,
+        std::print("{:17} {:15} {:17} {:04x} {}\n", device.interface,
                    device.source.ip, mac, device.type, oui::lookup(mac));
 
     // Print summary
