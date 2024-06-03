@@ -35,7 +35,7 @@ int main() {
   assert(not std::empty(interfaces));
 
   // Hit the ground running
-  std::atomic_bool running = true;
+  std::atomic<bool> running = true;
 
   // Container for the promises
   // These are counts of packets captured on each interface
