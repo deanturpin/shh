@@ -38,14 +38,11 @@ git diff > /tmp/diff.patch
 
 For an even sweeter development experience you can connect to the running container with Visual Studio Code.
 
-Run executing `bash` and then connect your IDE to the container. Open `/root/shh` and install CMake Tools and C++ to build and debug.
+Run executing `bash` (as above) and then connect your IDE to the running container. Open `/root/shh` and install extensions "CMake Tools" and "C++" to build and debug.
 
-```bash
-docker run -it --rm --network=host deanturpin/shh bash
-```
-## clone and build
+## Build locally
 
-You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run`, which invokes all the usual CMake commands and executes the binary. But you will need all the latest compilers installed of course.
+You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run` to invokes all the usual CMake commands and also executes the binary. But you will need all the latest compilers installed, of course.
 
 ## Design
 
