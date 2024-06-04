@@ -7,7 +7,7 @@ execute_process(
 )
 
 set(CMAKE_CXX_FLAGS "-std=c++26 -O1 -Wall -Wextra -Wpedantic -march=native -Wnrvo")
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_COMPILER g++-14)
 set(CMAKE_C_COMPILER gcc-14)
 
