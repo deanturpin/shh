@@ -48,8 +48,79 @@ You could even build without running in a container... imagine! Simply clone the
 
 The main thread starts a pcap logging thread for each interface; each thread then reads packets from a single interface and pushes captured packets to a shared container. Peridoically the main thread processes and empties the shared resource and prints a summary of devices encountered: basically the MAC address and associated IP/flags. The main thread runs for a fixed duration and then signals all the threads to stop before joining them to ensure no resources are leaked.
 
-Something that drove me mad for a while was not setting the pcap reads to non-blocking; whilst it worked fine on my macOS laptop, on Linux the threads would occasionally block and leave the main thread hanging. However, it did lead me to reimplement it several times using different thread classes: plain old `std::thread`, `std::jthread` with built-it stop token, `std::for_each` with `std::execution::par` and finally `std::async` with `std::launch::async`; which I think is quite nice to read: waiting for the return value from the thread is a natural way to synchronise with all the stopping threads.
+Something that drove me mad for a while was not setting the pcap reads to non-blocking; whilst it worked fine on my macOS laptop, on Linux the threads would occasionally block and leave the main thread hanging.
 
 ```cpp
 pcap_setnonblock(pcap, 1, errbuf);
+```
+
+## C++ features of note
+
+This project is my current testbed for the latest C++ features. I do have a run a [nightly latest GCC build](https://hub.docker.com/r/deanturpin/gcc) from source but GCC 14 is readily available on Linux and macOS so that will suffice.
+
+### GCC flags
+
+Firstly GCC 14 now accepts the `-std=c++26` flag, and it has also interoduced `-Wnrvo` to warn when the compiler is unable to perform return value optimisation.
+
+### "<print>" header
+
+I've been enjoying `std::format` for a while but now we have `std::print`! And also the variant with the implicit newline.
+
+```cpp
+std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
+```
+
+### size_t literals
+
+```cpp
+constexpr auto logging_cycles = 60uz;
+```
+
+### Zipped views
+
+```cpp
+auto zipped = std::views::zip(interfaces, counts);
+
+for (const auto& [interface, count] : zipped) {
+    std::println("{}: {}", interface, count);
+}
+```
+
+### Static assertions as compile-time unit testing
+
+```cpp
+static_assert(is_print('~'));
+static_assert(not is_print('\n'));
+static_assert(not std::has_virtual_destructor_v<packet_t>);
+```
+
+### Designated initialisers
+
+Name the members you want to initialise.
+
+```cpp
+return {
+    .interface = interface,
+    .source = {.mac = source_mac, .ip = source_ip},
+    .destination = {.mac = destination_mac, .ip = destination_ip},
+    .type = std::byteswap(eth.packet_type),
+    .length = header.len,
+};
+```
+
+### Ranges
+
+```cpp
+if (not std::ranges::any_of(
+        excludes, [name](auto excluded) { return name == excluded; }))
+    names.emplace_back(name);
+```
+
+### Threads
+
+I've used `std::async` to create each logging thread; which also provides a natural synchronisation point when you wait for the return value from each thread.
+
+```cpp
+  for (auto name : interfaces)
+    counts.emplace_back(std::async(std::launch::async, func, name));
 ```
