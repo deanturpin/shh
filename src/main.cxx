@@ -72,14 +72,15 @@ int main() {
   };
 
   // Start a capture thread for each interface
-  std::println("Starting {} threads", interfaces.size());
+  std::println("Starting {} threads\n", interfaces.size());
 
   for (auto name : interfaces)
     counts.emplace_back(std::async(std::launch::async, func, name));
 
-  // Duration of logging, application will exit after this time
+  // Number of logging iterations, application will then exit
   constexpr auto logging_cycles = 60uz;
 
+  // Start processing the packets, note the other threads are locked out
   for (auto i : std::views::iota(0uz, logging_cycles)) {
 
     constexpr auto interval = 1000ms;
@@ -128,5 +129,5 @@ int main() {
 
   // Wait for all the threads to finish
   for (auto [name, count] : zipped)
-    std::println("{:4} {:16}", count.get(), name);
+    std::println("{:6} {:16}", count.get(), name);
 }
