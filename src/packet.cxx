@@ -58,42 +58,42 @@ ethernet_packet_t packet_t::read() {
   static_assert(sizeof(ethernet_header_t) == 14);
   assert(header.len >= sizeof(ethernet_header_t));
 
-  auto eth = reinterpret_cast<const ethernet_header_t *>(data);
+  auto eth = *reinterpret_cast<const ethernet_header_t *>(data);
 
   auto source_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                  eth->source_mac[0], eth->source_mac[1], eth->source_mac[2],
-                  eth->source_mac[3], eth->source_mac[4], eth->source_mac[5]);
+                  eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
+                  eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
 
   auto destination_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                  eth->source_mac[0], eth->source_mac[1], eth->source_mac[2],
-                  eth->source_mac[3], eth->source_mac[4], eth->source_mac[5]);
+                  eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
+                  eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
 
   auto source_ip = std::string{};
   auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
-  if (std::byteswap(eth->packet_type) == 0x0800) {
+  if (std::byteswap(eth.packet_type) == 0x0800) {
 
     // Map the IPv4 structure onto these data
-    auto ip =
-        reinterpret_cast<const ip_header_t *>(data + sizeof(ethernet_header_t));
+    auto ip = *reinterpret_cast<const ip_header_t *>(data +
+                                                     sizeof(ethernet_header_t));
 
     // Extract from IP
-    source_ip = std::format("{}.{}.{}.{}", ip->source_ip[0], ip->source_ip[1],
-                            ip->source_ip[2], ip->source_ip[3]);
+    source_ip = std::format("{}.{}.{}.{}", ip.source_ip[0], ip.source_ip[1],
+                            ip.source_ip[2], ip.source_ip[3]);
 
     // Extract to IP
-    destination_ip = std::format("{}.{}.{}.{}", ip->dest_ip[0], ip->dest_ip[1],
-                                 ip->dest_ip[2], ip->dest_ip[3]);
+    destination_ip = std::format("{}.{}.{}.{}", ip.dest_ip[0], ip.dest_ip[1],
+                                 ip.dest_ip[2], ip.dest_ip[3]);
   }
 
   return {
       .interface = interface,
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
-      .type = std::byteswap(eth->packet_type),
+      .type = std::byteswap(eth.packet_type),
       .length = header.len,
   };
 }
