@@ -56,13 +56,13 @@ pcap_setnonblock(pcap, 1, errbuf);
 
 ## C++ features of note
 
-This project is my current testbed for the latest C++ features. I do have a run a [nightly latest GCC build](https://hub.docker.com/r/deanturpin/gcc) from source but GCC 14 is readily available on Linux and macOS so that will suffice.
+This project is my current testbed for the latest C++ features. I do run a [nightly latest GCC build](https://hub.docker.com/r/deanturpin/gcc) from source but GCC 14 is readily available on Linux and macOS so that will suffice.
 
 ### GCC flags
 
-Firstly GCC 14 now accepts the `-std=c++26` flag, and it has also interoduced `-Wnrvo` to warn when the compiler is unable to perform return value optimisation.
+Firstly GCC 14 now accepts the `-std=c++26` flag; it has also introduced `-Wnrvo` to warn when the compiler is unable to perform return value optimisation.
 
-### "<print>" header
+### "print" header
 
 I've been enjoying `std::format` for a while but now we have `std::print`! And also the variant with the implicit newline.
 
