@@ -74,7 +74,7 @@ ethernet_packet_t packet_t::read() {
   auto destination_ip = std::string{};
 
   // Get the IPs if it's an IPv4 packet
-  if (std::byteswap(eth.packet_type) == 0x0800) {
+  if (eth.packet_type == 0x0008) {
 
     // Map the IPv4 structure onto these data
     auto ip = *reinterpret_cast<const ip_header_t *>(data +
@@ -93,7 +93,7 @@ ethernet_packet_t packet_t::read() {
       .interface = interface,
       .source = {.mac = source_mac, .ip = source_ip},
       .destination = {.mac = destination_mac, .ip = destination_ip},
-      .type = std::byteswap(eth.packet_type),
+      .type = eth.packet_type,
       .length = header.len,
   };
 }
