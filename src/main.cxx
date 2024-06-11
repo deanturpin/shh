@@ -110,8 +110,8 @@ int main() {
     // Print the devices
     for (auto &[mac, device] : devices)
       if (!device.source.ip.empty() || !oui::lookup(mac).empty())
-        std::print("{:17} {:15} {:17} {:04x} {}\n", device.interface,
-                   device.source.ip, mac, device.type, oui::lookup(mac));
+        std::println("{:17} {:15} {:17} {:04x} {}", device.interface,
+                     device.source.ip, mac, device.type, oui::lookup(mac));
 
     // Print summary
     std::println("\n{} packets @ {:.3f} Mb/s - {}/{}\n", total_packets,
