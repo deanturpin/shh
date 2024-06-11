@@ -1,4 +1,4 @@
-# shh
+# shh - pcap packet sniffer
 
 See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile) and [issues](https://github.com/deanturpin/shh/issues).
 
