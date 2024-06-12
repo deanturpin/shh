@@ -98,9 +98,8 @@ int main() {
       // Store packet size
       total_bytes += packet.length;
 
-      // Store MAC addresses
+      // Store source MAC only
       devices[packet.source.mac] = packet;
-      devices[packet.destination.mac] = packet;
     }
 
     // Clear down the packets

@@ -40,6 +40,14 @@ For an even sweeter development experience you can connect to the running contai
 
 Run executing `bash` (as above) and then connect your IDE to the running container. Open `/root/shh` and install extensions "CMake Tools" and "C++" to build and debug.
 
+## Debugging with Codespaces
+
+Run the following in the web IDE terminal, it will build and run when a file changes.
+
+```bash
+docker run --rm -it --network=host -v .:/root/shh deanturpin/dev make --directory /root/shh entr
+```
+
 ## Build locally
 
 You could even build without running in a container... imagine! Simply clone the [repo](https://github.com/deanturpin/shh) and run `make run` to invokes all the usual CMake commands and also executes the binary. But you will need all the latest compilers installed, of course.
