@@ -22,9 +22,11 @@ int main() {
 
   using namespace std::chrono_literals;
 
-  std::atexit([] { std::println("God natt"); });
-
-  std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
+  // Exit through the git shop
+  std::atexit([] {
+    std::println("God natt");
+    std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
+  });
 
   // Shared data structure for storing captured packets
   auto packet_mutex = std::mutex{};
