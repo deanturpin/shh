@@ -1,6 +1,7 @@
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
+#include <barrier>
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
@@ -48,6 +49,11 @@ int main() {
   // These are counts of packets captured on each interface
   std::vector<std::future<size_t>> counts;
 
+  // Create a barrier to synchronize all threads
+  std::barrier barrier(interfaces.size(), [&] {
+    std::println("{} threads ready\n", interfaces.size());
+  });
+
   // The capture routine
   auto func = [&](auto name) {
     // Return the number of packets captured
@@ -55,6 +61,9 @@ int main() {
 
     // Create capture object
     auto capture = cap::packet_t{name};
+
+    // Wait at the barrier until all threads are ready
+    barrier.arrive_and_wait();
 
     // Capture packets until told to stop
     while (running) {
@@ -78,9 +87,7 @@ int main() {
     return total_packets;
   };
 
-  // Start a capture thread for each interface
-  std::println("Starting {} threads\n", interfaces.size());
-
+  // Start a thread for each interface
   for (auto name : interfaces)
     counts.emplace_back(std::async(std::launch::async, func, name));
 
