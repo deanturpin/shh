@@ -106,6 +106,9 @@ int main() {
     auto total_packets = packets.size();
     packets.clear();
 
+    // Clear the screen
+    std::print("\033[H\033[2J");
+
     // Print the devices
     for (auto &[mac, device] : devices)
       if (!device.source.ip.empty() || !oui::lookup(mac).empty())
