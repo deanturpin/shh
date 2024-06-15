@@ -6,7 +6,7 @@
 #include <map>
 #include <ranges>
 
-// Anonymous
+// Anonymous namespace
 namespace {
 
 // Remove any non-hex characters from a MAC address or vendor
@@ -44,6 +44,7 @@ std::string mac_to_vendor(std::string_view dirty) {
   return vendor;
 }
 
+// constexpr implementations of Standard Library functions
 namespace constd {
 
 // use string_view literals
@@ -134,7 +135,7 @@ static_assert(not is_valid_mac_address("00\n0000000000"));
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 
-  auto in = std::ifstream{"ieee-oui.txt"};
+  auto in = std::ifstream{"ieee-oui2.txt"};
 
   // Read whole file into a string
   auto str = std::string{std::istreambuf_iterator<char>{in},
@@ -178,6 +179,15 @@ std::map<std::string, std::string> get_oui() {
 
 // Initialise the database on startup
 const auto database = get_oui();
+
+// // Test if a string is blank
+// constexpr bool is_blank(std::string_view str) {
+//   return std::ranges::all_of(str, [](char c) { return std::isspace(c); });
+// }
+
+// static_assert(is_blank(""));
+// static_assert(is_blank(" "));
+
 } // namespace
 
 // Lookup a MAC address in the database
