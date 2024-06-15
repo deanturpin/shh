@@ -180,14 +180,6 @@ std::map<std::string, std::string> get_oui() {
 // Initialise the database on startup
 const auto database = get_oui();
 
-// // Test if a string is blank
-// constexpr bool is_blank(std::string_view str) {
-//   return std::ranges::all_of(str, [](char c) { return std::isspace(c); });
-// }
-
-// static_assert(is_blank(""));
-// static_assert(is_blank(" "));
-
 } // namespace
 
 // Lookup a MAC address in the database

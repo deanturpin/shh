@@ -90,8 +90,7 @@ int main() {
   // Start processing the packets, note the other threads are locked out
   for (auto i : std::views::iota(0uz, logging_cycles)) {
 
-    constexpr auto interval = 1000ms;
-    std::this_thread::sleep_for(interval);
+    std::this_thread::sleep_for(1s);
 
     // Map of devices
     static std::map<std::string, ethernet_packet_t> devices;
