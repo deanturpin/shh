@@ -45,9 +45,7 @@ int main() {
   std::vector<std::future<size_t>> counts;
 
   // Create a barrier to synchronize all threads
-  std::barrier barrier(interfaces.size(), [&] {
-    std::println("{} threads ready\n", interfaces.size());
-  });
+  std::barrier barrier(interfaces.size());
 
   // The capture routine
   auto func = [&](auto name) {
@@ -57,11 +55,11 @@ int main() {
     // Create capture object
     auto capture = cap::packet_t{name};
 
-    // Wait at the barrier until all threads are ready
-    barrier.arrive_and_wait();
-
     // Capture packets until told to stop
     while (running) {
+
+      // Wait at the barrier until all threads are ready
+      barrier.arrive_and_wait();
 
       // Read one packet
       ethernet_packet_t packet = capture.read();
@@ -75,7 +73,7 @@ int main() {
       ++total_packets;
 
       // Otherwise store the packet
-      std::scoped_lock lock{packet_mutex};
+      std::lock_guard lock{packet_mutex};
       packets.emplace_back(packet);
     }
 
@@ -101,7 +99,7 @@ int main() {
     auto total_bytes = 0uz;
 
     // Process the packets
-    std::scoped_lock lock{packet_mutex};
+    std::lock_guard lock{packet_mutex};
     for (auto packet : packets) {
 
       // Store packet size
@@ -125,9 +123,8 @@ int main() {
                      device.source.ip, mac, device.type, oui::lookup(mac));
 
     // Print summary
-    std::println("\n{} packets @ {:.3f} Mb/s - {}/{}\n", total_packets,
-                 (total_bytes * 8 / 1'000'000.0) / interval.count(), i + 1,
-                 logging_cycles);
+    std::println("\n{:02}/{:02} packets: {}\n", i + 1, logging_cycles,
+                 total_packets);
   }
 
   std::println("Stopping {} threads", interfaces.size());
