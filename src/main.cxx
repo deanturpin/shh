@@ -25,11 +25,6 @@ int main() {
 
   // Exit through the git shop
   std::atexit([] {
-    // Get terminal width
-    const char *terminal_width_str = std::getenv("COLUMNS");
-    int terminal_width =
-        (terminal_width_str != nullptr) ? std::stoi(terminal_width_str) : 80;
-    std::println("Terminal width: {}", terminal_width);
     std::println("\nGod natt");
     std::println("https://github.com/deanturpin/shh/commit/{}\n", GIT_HASH);
   });
