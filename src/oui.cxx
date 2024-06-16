@@ -135,7 +135,7 @@ static_assert(not is_valid_mac_address("00\n0000000000"));
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 
-  auto in = std::ifstream{"ieee-oui2.txt"};
+  auto in = std::ifstream{"ieee-oui.txt"};
 
   // Read whole file into a string
   auto str = std::string{std::istreambuf_iterator<char>{in},
