@@ -65,10 +65,10 @@ ethernet_packet_t packet_t::read() {
                   eth.source_mac[0], eth.source_mac[1], eth.source_mac[2],
                   eth.source_mac[3], eth.source_mac[4], eth.source_mac[5]);
 
-  auto destination_mac =
-      std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-                  eth.destination_mac[0], eth.destination_mac[1], eth.destination_mac[2],
-                  eth.destination_mac[3], eth.destination_mac[4], eth.destination_mac[5]);
+  auto destination_mac = std::format(
+      "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", eth.destination_mac[0],
+      eth.destination_mac[1], eth.destination_mac[2], eth.destination_mac[3],
+      eth.destination_mac[4], eth.destination_mac[5]);
 
   auto source_ip = std::string{};
   auto destination_ip = std::string{};

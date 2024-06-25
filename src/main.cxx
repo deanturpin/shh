@@ -85,7 +85,7 @@ int main() {
     counts.emplace_back(std::async(std::launch::async, func, name));
 
   // Number of logging iterations, application will then exit
-  constexpr auto logging_cycles = 60uz;
+  constexpr auto logging_cycles = 600uz;
 
   // Start processing the packets, note the other threads are locked out
   for (auto i : std::views::iota(0uz, logging_cycles)) {
