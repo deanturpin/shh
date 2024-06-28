@@ -72,22 +72,14 @@ static_assert(get_vendor_desc("00:00:00:00:00:00") == std::pair{""sv, ""sv});
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
 
-  auto in = std::ifstream{"ieee-oui.txt"};
+  // Open the system vendor file
+  auto in = std::ifstream{"/usr/share/arp-scan/ieee-oui.txt"};
 
   // Read whole file into a string
   auto str = std::string{std::istreambuf_iterator<char>{in},
                          std::istreambuf_iterator<char>{}};
 
-  // Initialise database with some vendors that are missing from the oui.txt
-  auto oui = std::map<std::string, std::string>{
-      {"f2ed07", "Nothing Technology Limited"},
-      {"3e0692", "Nothing Technology Limited"},
-      {"01005e", "IPv4 multicast"},
-      {"0180c2", "IEEE 802.1X"},
-      {"333300", "IPv6 multicast"},
-      {"3333ff", "IPv6 multicast"},
-      {"ffffff", "Broadcast"},
-      {"000000", "Unicast"}};
+  auto oui = std::map<std::string, std::string>{};
 
   // Parse each line
   for (auto line : str | std::views::split('\n')) {

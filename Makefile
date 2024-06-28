@@ -1,6 +1,6 @@
 MAKEFLAGS += --silent
 
-all: ieee-oui.txt
+all:
 	cmake -B build -S .
 	cmake --build build --parallel
 
@@ -15,13 +15,6 @@ stats:
 
 clean:
 	$(RM) -r build
-
-ieee-oui.txt:
-	if [ -f /usr/share/arp-scan/ieee-oui.txt ]; then \
-		cp /usr/share/arp-scan/ieee-oui.txt $@; \
-	else \
-		curl https://standards-oui.ieee.org/oui/oui.txt --output $@; \
-	fi
 
 publish:
 	mkdir -p public/
