@@ -17,8 +17,6 @@ auto strip(std::string_view mac) {
   stripped.erase(std::remove_if(stripped.begin(), stripped.end(),
                                 [](char c) { return not std::isxdigit(c); }),
                  stripped.end());
-  // std::transform(stripped.begin(), stripped.end(), stripped.begin(),
-  // ::tolower);
 
   assert(not stripped.contains(" "));
   assert(not stripped.contains(":"));

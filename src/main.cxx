@@ -113,7 +113,7 @@ int main() {
     packets.clear();
 
     // Clear the screen
-    // std::print("\033[H\033[2J");
+    std::print("\033[H\033[2J");
 
     // Print the devices
     for (auto &[mac, device] : devices)
