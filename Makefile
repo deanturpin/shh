@@ -17,7 +17,11 @@ clean:
 	$(RM) -r build
 
 ieee-oui.txt:
-	curl https://standards-oui.ieee.org/oui/oui.txt --output $@
+	if [ -f /usr/share/arp-scan/ieee-oui.txt ]; then \
+		cp /usr/share/arp-scan/ieee-oui.txt $@; \
+	else \
+		curl https://standards-oui.ieee.org/oui/oui.txt --output $@; \
+	fi
 
 publish:
 	mkdir -p public/

@@ -5,23 +5,26 @@
 #include <fstream>
 #include <map>
 #include <ranges>
+#include <string>
+#include <string_view>
 
 // Anonymous namespace
 namespace {
 
 // Remove any non-hex characters from a MAC address or vendor
 auto strip(std::string_view mac) {
-  auto key = std::string{mac};
-  key.erase(std::remove_if(key.begin(), key.end(),
-                           [](char c) { return not std::isxdigit(c); }),
-            key.end());
-  std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+  auto stripped = std::string{mac};
+  stripped.erase(std::remove_if(stripped.begin(), stripped.end(),
+                                [](char c) { return not std::isxdigit(c); }),
+                 stripped.end());
+  // std::transform(stripped.begin(), stripped.end(), stripped.begin(),
+  // ::tolower);
 
-  assert(not key.contains(" "));
-  assert(not key.contains(":"));
-  assert(not key.contains(":"));
+  assert(not stripped.contains(" "));
+  assert(not stripped.contains(":"));
+  assert(not stripped.contains(":"));
 
-  return key;
+  return stripped;
 }
 
 // Remove any non-printable characters from a string
@@ -33,104 +36,40 @@ auto sanitise(std::string_view str) {
   return key;
 }
 
-// Tidy up a MAC address into just the vendor part
-std::string mac_to_vendor(std::string_view dirty) {
-
-  // Tidy up the incoming MAC address
-  auto clean = strip(sanitise(dirty));
-  auto vendor = clean.substr(0, 6);
-
-  assert(std::size(vendor) == 6);
-  return vendor;
-}
-
-// constexpr implementations of Standard Library functions
-namespace constd {
-
-// use string_view literals
 using namespace std::string_view_literals;
 
-// Make it easy to replace this with a constexpr function
-// Can be marked deprecated
-constexpr bool is_print(char c) {
+// Get key/value pairs from an entry in the OUI database
+// Otherwise return a pair of empty strings
+constexpr std::pair<std::string, std::string>
+get_vendor_desc(std::string_view line) {
 
-  // All printable characters
-  constexpr auto printable_chars =
-      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()"
-      "*+,-./:;<=>?@[\\]^_`{|}~ "sv;
+  auto out = std::pair<std::string, std::string>{};
 
-  return printable_chars.contains(c);
+  // Find the first space
+  auto space = line.find_first_of(" \t");
+
+  // If no space, return empty strings
+  if (space == std::string::npos)
+    return out;
+
+  // Otherwise split on the first space
+  auto key = line.substr(0, space);
+  auto value = line.substr(space + 1);
+
+  // Trim any leading or trailing spaces
+  value.remove_prefix(std::min(value.find_first_not_of(' '), value.size()));
+
+  out = {std::string{key}, std::string{value}};
+
+  return out;
 }
 
-static_assert(is_print(' '));
-static_assert(is_print('a'));
-static_assert(is_print('A'));
-static_assert(is_print('!'));
-static_assert(is_print('~'));
-static_assert(not is_print('\n'));
-static_assert(not is_print('\b'));
-static_assert(not is_print('\t'));
-
-// Check for hexadecimals
-constexpr bool isxdigit(char c) {
-  return "0123456789abcdefABCDEF"sv.contains(c);
-}
-
-static_assert(isxdigit('0'));
-static_assert(isxdigit('9'));
-static_assert(isxdigit('a'));
-static_assert(isxdigit('f'));
-static_assert(isxdigit('A'));
-static_assert(isxdigit('F'));
-static_assert(not isxdigit('g'));
-static_assert(not isxdigit('G'));
-static_assert(not isxdigit(' '));
-static_assert(not isxdigit('\n'));
-static_assert(not isxdigit('\b'));
-
-} // namespace constd
-
-// Confirm a MAC is the correct length and uses only the valid characters
-// Note they can be either case, but must be consistent
-constexpr bool is_valid_mac_address(std::string_view mac) {
-
-  // No colon format
-  if (std::size(mac) == 12) {
-    // Only hexadecimals allowed
-    if (std::ranges::all_of(mac, [](char c) { return constd::isxdigit(c); }))
-      return true;
-  }
-
-  // Colon format
-  else if (std::size(mac) == 17) {
-    // Only hexadecimals and colons allowed
-    if (std::ranges::all_of(
-            mac, [](char c) { return constd::isxdigit(c) or c == ':'; }))
-      return true;
-  }
-
-  // Not a valid MAC address
-  return false;
-}
-
-// Colon format
-static_assert(is_valid_mac_address("00:00:00:00:00:00"));
-static_assert(is_valid_mac_address("ff:ff:ff:ff:ff:ff"));
-
-// No colon format
-static_assert(is_valid_mac_address("000000000000"));
-static_assert(is_valid_mac_address("ffffffffffff"));
-
-// Invalid formats
-static_assert(not is_valid_mac_address(""));
-static_assert(not is_valid_mac_address("00:00:00:00:"));
-static_assert(not is_valid_mac_address("00:00:00:00:00:00:0 "));
-static_assert(not is_valid_mac_address("\n\b\n\b\n\b\n\b\n\b\n\b"));
-static_assert(not is_valid_mac_address("00:00:00:00:00:00:00"));
-static_assert(not is_valid_mac_address("00:00:00:00:00"));
-static_assert(not is_valid_mac_address("00:00:00:00:00:00:00:00"));
-static_assert(not is_valid_mac_address("00:\n00:00:00:00:00"));
-static_assert(not is_valid_mac_address("00\n0000000000"));
+static_assert(get_vendor_desc("a b") == std::pair{"a"sv, "b"sv});
+static_assert(get_vendor_desc("a  b") == std::pair{"a"sv, "b"sv});
+static_assert(get_vendor_desc("a\tb") == std::pair{"a"sv, "b"sv});
+static_assert(get_vendor_desc("00:00:00:00:00:00      Unicast") ==
+              std::pair{"00:00:00:00:00:00"sv, "Unicast"sv});
+static_assert(get_vendor_desc("00:00:00:00:00:00") == std::pair{""sv, ""sv});
 
 // Create the OUI database from a text file
 std::map<std::string, std::string> get_oui() {
@@ -155,23 +94,18 @@ std::map<std::string, std::string> get_oui() {
   // Parse each line
   for (auto line : str | std::views::split('\n')) {
 
-    // Look for all the lines with the (hex) string
-    auto s = std::string{line.begin(), line.end()};
-    if (not s.contains("(hex)") or s.empty())
+    if (line.empty())
       continue;
 
-    auto pos = s.find("(hex)");
+    if (line.front() == '#')
+      continue;
 
-    if (pos != std::string::npos) {
+    auto [key, value] = get_vendor_desc(std::string{line.begin(), line.end()});
 
-      auto key = s.substr(0, 8);
-      auto value = s.substr(pos + 6);
+    if (key.empty())
+      continue;
 
-      // Remove non-hex characters before using the key
-      auto vendor = strip(key);
-
-      oui[vendor] = value;
-    }
+    oui[std::string{key}] = std::string{value};
   }
 
   return oui;
@@ -186,16 +120,26 @@ const auto database = get_oui();
 namespace oui {
 std::string lookup(std::string_view mac) {
 
-  // Create key from MAC address
-  auto vendor = mac_to_vendor(mac);
+  auto vendor = std::string{"unknown"};
 
-  // Search for the vendor in the database
-  auto it = database.find(vendor);
-  auto details = it != database.end() ? it->second : "";
+  // Remove any non-hex characters from the MAC address
+  auto key2 = strip(mac);
 
-  // Return the cleaned up vendor details if found
-  // Otherwise just return the MAC address
-  return std::empty(details) ? std::string{} : sanitise(details);
+  // Make uppercase
+  std::transform(key2.begin(), key2.end(), key2.begin(), ::toupper);
+
+  // Match the largest portion of the MAC address in the database
+  while (std::size(key2) > 5) {
+
+    // Search for the vendor in the database
+    if (database.contains(key2))
+      return sanitise(database.at(key2));
+
+    // Remove the last character
+    key2.pop_back();
+  }
+
+  return {};
 }
 
 // Pretty print the MAC address

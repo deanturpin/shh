@@ -113,13 +113,13 @@ int main() {
     packets.clear();
 
     // Clear the screen
-    std::print("\033[H\033[2J");
+    // std::print("\033[H\033[2J");
 
     // Print the devices
     for (auto &[mac, device] : devices)
-      if (!device.source.ip.empty() || !oui::lookup(mac).empty())
-        std::println("{:17} {:15} {:17} {:04x} {}", device.interface,
-                     device.source.ip, mac, device.type, oui::lookup(mac));
+      // if (not device.source.ip.empty() || not oui::lookup(mac).empty())
+      std::println("{:17} {:15} {:17} {:04x} {}", device.interface,
+                   device.source.ip, mac, device.type, oui::lookup(mac));
 
     // Print summary
     std::println("\n{:02}/{:02} packets: {}\n", i + 1, logging_cycles,
