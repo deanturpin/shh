@@ -6,6 +6,7 @@
 #include <cassert>
 #include <format>
 #include <ranges>
+#include <span>
 
 namespace cap {
 
@@ -58,7 +59,9 @@ ethernet_packet_t packet_t::read() {
   static_assert(sizeof(ethernet_header_t) == 14);
   assert(header.len >= sizeof(ethernet_header_t));
 
-  auto eth = *reinterpret_cast<const ethernet_header_t *>(data);
+  // Map the ethernet header
+  auto eth =
+      std::span{reinterpret_cast<const ethernet_header_t *>(data), 1}.front();
 
   auto source_mac =
       std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
@@ -76,9 +79,11 @@ ethernet_packet_t packet_t::read() {
   // Get the IPs if it's an IPv4 packet
   if (eth.packet_type == 0x0008) {
 
-    // Map the IPv4 structure onto these data
-    auto ip = *reinterpret_cast<const ip_header_t *>(data +
-                                                     sizeof(ethernet_header_t));
+    // Map the IP header
+    auto ip = std::span{reinterpret_cast<const ip_header_t *>(
+                            data + sizeof(ethernet_header_t)),
+                        1}
+                  .front();
 
     // Extract from IP
     source_ip = std::format("{}.{}.{}.{}", ip.source_ip[0], ip.source_ip[1],
