@@ -82,7 +82,7 @@ int main() {
 
   // Start a thread for each interface
   for (auto name : interfaces)
-    counts.emplace_back(std::async(std::launch::async, func, name));
+    counts.emplace_back(async(std::launch::async, func, name));
 
   // Number of logging iterations, application will then exit
   constexpr auto logging_cycles = 600uz;
