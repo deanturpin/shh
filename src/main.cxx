@@ -1,11 +1,9 @@
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
-#include <barrier>
+#include <atomic>
 #include <cassert>
 #include <chrono>
-#include <cstdlib>
-#include <format>
 #include <future>
 #include <map>
 #include <mutex>
@@ -20,8 +18,6 @@
 #endif
 
 int main() {
-
-  using namespace std::chrono_literals;
 
   // Exit through the git shop
   std::atexit([] {
@@ -38,14 +34,13 @@ int main() {
   assert(not std::empty(interfaces));
 
   // Hit the ground running
-  std::atomic<bool> running = true;
+  auto running = std::atomic_bool{true};
 
   // Container for the promises
   // These are counts of packets captured on each interface
-  std::vector<std::future<size_t>> counts;
+  auto counts = std::vector<std::future<size_t>>{};
 
-  // Create a barrier to synchronize all threads
-  std::barrier barrier(interfaces.size());
+  using namespace std::chrono_literals;
 
   // The capture routine
   auto func = [&](auto name) {
@@ -57,9 +52,6 @@ int main() {
 
     // Capture packets until told to stop
     while (running) {
-
-      // Wait at the barrier until all threads are ready
-      barrier.arrive_and_wait();
 
       // Read one packet
       ethernet_packet_t packet = capture.read();
@@ -73,7 +65,7 @@ int main() {
       ++total_packets;
 
       // Otherwise store the packet
-      std::lock_guard lock{packet_mutex};
+      auto lock = std::lock_guard{packet_mutex};
       packets.emplace_back(packet);
     }
 
@@ -93,20 +85,12 @@ int main() {
     std::this_thread::sleep_for(1s);
 
     // Map of devices
-    static std::map<std::string, ethernet_packet_t> devices;
-
-    auto total_bytes = 0uz;
+    static auto devices = std::map<std::string, ethernet_packet_t>{};
 
     // Process the packets
-    std::lock_guard lock{packet_mutex};
-    for (auto packet : packets) {
-
-      // Store packet size
-      total_bytes += packet.length;
-
-      // Store source MAC only
+    auto lock = std::lock_guard{packet_mutex};
+    for (auto packet : packets)
       devices[packet.source.mac] = packet;
-    }
 
     // Clear down the packets
     auto total_packets = packets.size();
@@ -117,12 +101,11 @@ int main() {
 
     // Print the devices
     for (auto &[mac, device] : devices)
-      // if (not device.source.ip.empty() || not oui::lookup(mac).empty())
       std::println("{:17} {:15} {:17} {:04x} {}", device.interface,
                    device.source.ip, mac, device.type, oui::lookup(mac));
 
     // Print summary
-    std::println("\n{:02}/{:02} packets: {}\n", i + 1, logging_cycles,
+    std::println("\n{:3}/{:03} packets: {}\n", i + 1, logging_cycles,
                  total_packets);
   }
 
@@ -135,8 +118,6 @@ int main() {
   auto zipped = std::views::zip(interfaces, counts);
 
   // Wait for all the threads to finish
-  for (auto [name, count] : zipped) {
-    std::println("Stopping {:16}...", name);
+  for (auto [name, count] : zipped)
     std::println("\t{:16} {:6}", name, count.get(), name);
-  }
 }
