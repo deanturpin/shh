@@ -135,6 +135,8 @@ int main() {
   auto zipped = std::views::zip(interfaces, counts);
 
   // Wait for all the threads to finish
-  for (auto [name, count] : zipped)
-    std::println("{:6} {:16}", count.get(), name);
+  for (auto [name, count] : zipped) {
+    std::println("Stopping {:16}...", name);
+    std::println("\t{:16} {:6}", name, count.get(), name);
+  }
 }

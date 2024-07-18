@@ -79,6 +79,7 @@ std::map<std::string, std::string> get_oui() {
   auto str = std::string{std::istreambuf_iterator<char>{in},
                          std::istreambuf_iterator<char>{}};
 
+  // The vendor database
   auto oui = std::map<std::string, std::string>{};
 
   // Parse each line

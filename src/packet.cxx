@@ -119,7 +119,8 @@ std::vector<std::string> interfaces() {
 
     // Exclude list
     auto name = std::string{dev->name};
-    constexpr auto excludes = std::array{"any", "nflog", "gpd0"};
+    constexpr auto excludes =
+        std::array{"any", "nflog", "gpd0", "bluetooth-monitor", "bluetooth0"};
 
     // Skip the excluded interfaces
     if (not std::ranges::any_of(
