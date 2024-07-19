@@ -37,7 +37,7 @@ int main() {
   auto running = std::atomic_bool{true};
 
   // Container for the promises
-  // These are counts of packets captured on each interface
+  // These return counts of packets captured on each interface
   auto counts = std::vector<std::future<size_t>>{};
 
   using namespace std::chrono_literals;
@@ -77,20 +77,52 @@ int main() {
     counts.emplace_back(async(std::launch::async, func, name));
 
   // Number of logging iterations, application will then exit
-  constexpr auto logging_cycles = 600uz;
+  constexpr auto cycles = std::views::iota(0uz, 600uz);
 
   // Start processing the packets, note the other threads are locked out
-  for (auto i : std::views::iota(0uz, logging_cycles)) {
+  for (auto i : cycles) {
 
     std::this_thread::sleep_for(1s);
 
+    // Consolidated packet structure
+    struct device_t {
+      std::string interface{};
+      std::string ip{};
+      std::string mac{};
+      std::string vendor{};
+      uint16_t type{};
+    };
+
     // Map of devices
-    static auto devices = std::map<std::string, ethernet_packet_t>{};
+    static auto devices = std::vector<device_t>{};
 
     // Process the packets
     auto lock = std::lock_guard{packet_mutex};
-    for (auto packet : packets)
-      devices[packet.source.mac] = packet;
+    for (auto packet : packets) {
+
+      if (packet.source.mac.empty())
+        continue;
+
+      // Find the device
+      auto it = std::ranges::find_if(devices, [&](auto &device) {
+        return device.mac == packet.source.mac;
+      });
+
+      // If it doesn't exist, create it
+      if (it == devices.end()) {
+        devices.emplace_back(
+            device_t{packet.interface, packet.source.ip, packet.source.mac,
+                     oui::lookup(packet.source.mac), packet.type});
+        continue;
+      }
+
+      // Update the device, but only the IP if it's not already set
+      if (not packet.source.ip.empty())
+        it->ip = packet.source.ip;
+
+      // Update type
+      it->type = packet.type;
+    }
 
     // Clear down the packets
     auto total_packets = packets.size();
@@ -99,19 +131,21 @@ int main() {
     // Clear the screen
     std::print("\033[H\033[2J");
 
+    // Report current time
+    std::println("{}\n", std::chrono::system_clock::now());
+
     // Print the devices
-    for (auto &[mac, device] : devices)
-      std::println("{:17} {:15} {:17} {:04x} {}", device.interface,
-                   device.source.ip, mac, device.type, oui::lookup(mac));
+    for (auto device : devices)
+      std::println("{:17} {:15} {:17} {:04x} {}", device.interface, device.ip,
+                   device.mac, device.type, oui::lookup(device.mac));
 
     // Print summary
-    std::println("\n{:3}/{:03} packets: {}\n", i + 1, logging_cycles,
-                 total_packets);
+    std::println("\n{:3}/{:03} packets: {}\n", i + 1,
+                 std::ranges::distance(cycles), total_packets);
   }
 
-  std::println("Stopping {} threads", interfaces.size());
-
   // Ask all the threads to finish what they're doing
+  std::println("Stopping {} threads", interfaces.size());
   running = false;
 
   // Wrap names and return values for convenience
