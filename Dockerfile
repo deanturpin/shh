@@ -4,7 +4,8 @@ WORKDIR /root/shh
 COPY . .
 
 RUN make
-CMD figlet deanturpin/shh && \
+CMD clear && \
+    figlet deanturpin/shh && \
     ip -brief addr && \
-    sleep 3s && \
+    sleep 5s && \
     stdbuf -o0 -e0 build/shh
