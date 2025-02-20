@@ -6,6 +6,6 @@ COPY . .
 RUN make
 CMD clear && \
     figlet deanturpin/shh && \
-    ip -brief addr && \
-    sleep 5s && \
+    cat /etc/os-release && \
+    sleep 2s && \
     stdbuf -o0 -e0 build/shh
