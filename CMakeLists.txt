@@ -21,5 +21,25 @@ add_executable(${PROJECT_NAME}
 
 # Define a preprocessor macro with the git hash
 target_compile_definitions(${PROJECT_NAME} PRIVATE GIT_HASH="${GIT_HASH}")
-
 target_link_libraries(${PROJECT_NAME} pcap)
+
+install(TARGETS ${PROJECT_NAME}
+	DESTINATION bin
+)
+
+# CPack configuration
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "shh")
+set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_PACKAGE_DESCRIPTION "A brief description of your package")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A summary of your package")
+set(CPACK_PACKAGE_MAINTAINER "Your Name <youremail@example.com>")
+set(CPACK_PACKAGE_VENDOR "Your Company")
+set(CPACK_PACKAGE_CONTACT "Your Name <youremail@example.com>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <youremail@example.com>")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.7)")  # Add any runtime dependencies here
+
+include(CPack)
+
