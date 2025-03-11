@@ -19,3 +19,7 @@ clean:
 publish:
 	mkdir -p public/
 	pandoc index.md --standalone --output public/index.html
+
+package:
+	cpack
+	dpkg --contents *.deb
