@@ -58,6 +58,7 @@ Always set pcap to non-blocking mode with `pcap_setnonblock(pcap, 1, errbuf)`. W
 - **cap::packet_t** ([packet.h](src/packet.h), [packet.cxx](src/packet.cxx)): RAII wrapper for pcap capture on a single interface. Non-copyable, non-movable. The `read()` method returns `ethernet_packet_t` structs.
 - **cap::interfaces()** ([packet.cxx:109-134](src/packet.cxx#L109-L134)): Returns list of network interfaces, excluding loopback and virtual devices
 - **oui::lookup()** ([oui.h](src/oui.h)): MAC address vendor lookup
+- **dns::reverse_lookup()** ([dns.h](src/dns.h), [dns.cxx](src/dns.cxx)): Non-blocking reverse DNS lookup using async futures with caching
 - **ethernet_packet_t** ([types.h](src/types.h)): Data structure containing interface name, source/destination MAC and IP, packet type, and length
 
 ### Main Loop

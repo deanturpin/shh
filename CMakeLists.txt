@@ -15,6 +15,7 @@ project(shh)
 
 add_executable(${PROJECT_NAME}
     src/main.cxx
+    src/dns.cxx
     src/oui.cxx
     src/packet.cxx
 )

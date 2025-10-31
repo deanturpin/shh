@@ -1,3 +1,4 @@
+#include "dns.h"
 #include "oui.h"
 #include "packet.h"
 #include "types.h"
@@ -88,6 +89,7 @@ int main() {
     struct device_t {
       std::string interface{};
       std::string ip{};
+      std::string hostname{};
       std::string mac{};
       std::string vendor{};
       uint16_t type{};
@@ -110,15 +112,21 @@ int main() {
 
       // If it doesn't exist, create it
       if (it == devices.end()) {
-        devices.emplace_back(
-            device_t{packet.interface, packet.source.ip, packet.source.mac,
-                     oui::lookup(packet.source.mac), packet.type});
+        devices.emplace_back(device_t{packet.interface, packet.source.ip,
+                                       dns::reverse_lookup(packet.source.ip),
+                                       packet.source.mac,
+                                       oui::lookup(packet.source.mac),
+                                       packet.type});
         continue;
       }
 
       // Update the device, but only the IP if it's not already set
       if (not packet.source.ip.empty())
         it->ip = packet.source.ip;
+
+      // Update hostname if we don't have it yet
+      if (it->hostname.empty())
+        it->hostname = dns::reverse_lookup(it->ip);
 
       // Update type
       it->type = packet.type;
@@ -136,8 +144,9 @@ int main() {
 
     // Print the devices
     for (auto device : devices)
-      std::println("{:17} {:15} {:17} {:04x} {}", device.interface, device.ip,
-                   device.mac, device.type, oui::lookup(device.mac));
+      std::println("{:17} {:15} {:20} {:17} {:04x} {}", device.interface,
+                   device.ip, device.hostname, device.mac, device.type,
+                   device.vendor);
 
     // Print summary
     std::println("\n{:3}/{:03} packets: {}\n", i + 1,
