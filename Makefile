@@ -23,3 +23,7 @@ publish:
 package:
 	cpack
 	dpkg --contents *.deb
+
+lint:
+	docker run --rm -i hadolint/hadolint < Dockerfile || true
+	markdownlint *.md || true
