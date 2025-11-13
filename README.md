@@ -1,5 +1,7 @@
 # shh - pcap packet sniffer
 
+> Note: this is superseded by [stooge](https://hub.docker.com/r/deanturpin/stooge).
+
 See the [Dockerfile](https://github.com/deanturpin/shh/blob/main/Dockerfile) and [issues](https://github.com/deanturpin/shh/issues).
 
 ## Basic operation
