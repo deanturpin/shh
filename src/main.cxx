@@ -140,7 +140,8 @@ int main() {
     std::print("\033[H\033[2J");
 
     // Report current time
-    std::println("{}\n", std::chrono::system_clock::now());
+    std::println("{}", std::chrono::system_clock::now());
+    std::println("superseded by deanturpin/stooge\n");
 
     // Print the devices
     for (auto device : devices)
